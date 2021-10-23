@@ -27,12 +27,12 @@ ul>li:hover {
     margin-left: 80px;
 }
 
-.done {
+.marked {
     color: rgb(255, 0, 0);
     text-decoration: line-through;
 }
 
-.undone {
+.unmarked {
     color: #61fb88;
 }
 

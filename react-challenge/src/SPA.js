@@ -1,52 +1,59 @@
 import React, { Component } from "react";
 import {generateUniqueID} from "web-vitals/dist/modules/lib/generateUniqueID";
 
+const ListContext = React.createContext({TaskList})
 
-
-class TaskItem extends Component{
-    constructor(props) {
-        super(props);
-        this.state = {
-            uniqueId : generateUniqueID,
-            stringValue : "",
-            isMarked : false,
-            dateAdded : Date.now(),
-            dateModified : Date.now(),
-            archived : false
-        };
-
-    }
-
-
-    render() {
+function TaskItem ({ item }) {
         return (
-            <li className="task-item ">
-                <div className={TaskItem}>
-                    {this.state.stringValue}
+            <li className="task-item" style={{ textDecoration : item.isMarked ? "marked" : ""} }>
+                <div className="task-string">
+                    {item.taskString}
                 </div>
             </li>
         )
-    }
 }
 
-class TaskList extends Component{
-    constructor(props) {
-        super(props);
-        this.state = {
-            taskList: []
+function TaskList (){
+    const [tasks, setTasks] = React.useState([
+        {
+            index : 0,
+            uniqueId : generateUniqueID,
+            isMarked : true,
+            dateAdded : Date.now(),
+            dateModified : Date.now(),
+            archived : false,
+            taskString: "Add new task"
+        },
+
+        {
+            index : 1,
+            uniqueId : generateUniqueID,
+            isMarked : false,
+            dateAdded : Date.now(),
+            dateModified : Date.now(),
+            archived : false,
+            taskString: "Edit task"
+        },
+
+        {
+            index : 2,
+            uniqueId : generateUniqueID,
+            isMarked : false,
+            dateAdded : Date.now(),
+            dateModified : Date.now(),
+            archived : false,
+            taskString: "Complete task"
         }
-        this.addNewItem = this.addNewItem.bind(this);
-    }
-
-    addNewItem(task){
-        this.state.taskList.push(task);
-    }
-
-    render(){
+    ]);
         return(
-            <ul className="task-list">{this.state.taskList}</ul>
+            <ul className="task-list">{tasks.map((item, index) => (
+                <TaskItem
+                key={index}
+                index={index}
+                item={item}
+                />
+                ))}</ul>
         )
-    }
 }
 
 class SPA extends Component {
@@ -60,15 +67,14 @@ class SPA extends Component {
                     <li><a href="/support">support</a></li>
                 </ul>
                 <div className="content">
-                    {testList}
+                    <TaskList></TaskList>
                 </div>
             </div>
         );
     }
 }
 
-//Some testing data
-let testList = <TaskList></TaskList>
+
 
 
 export default SPA;
