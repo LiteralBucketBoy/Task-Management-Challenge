@@ -3,10 +3,15 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import SPA from "./SPA";
+import {TaskListInfo} from "./TaskList";
 
 ReactDOM.render(
   <React.StrictMode>
-    <SPA  />
+      <div className="App">
+          <TaskListInfo>
+              <SPA></SPA>
+          </TaskListInfo>
+      </div>
   </React.StrictMode>,
   document.getElementById('root')
 );
