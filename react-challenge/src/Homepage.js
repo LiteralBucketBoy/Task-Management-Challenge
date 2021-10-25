@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import {ListContext, TaskList} from "./TaskList";
-import {v4 as uuidv4} from "uuid";
 
 
 
@@ -27,7 +26,7 @@ function TaskForm({addTask}){
                 required
             />
             <button onClick={()=> e => setTask(e.target.value)}>
-            add task
+            Add task
             </button>
         </form>
 
