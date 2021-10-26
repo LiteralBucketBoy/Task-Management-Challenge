@@ -10,17 +10,31 @@ import LogIn from "./Components/UserData/LogIn";
 
 const SPA = () =>{
     const { currentUser, setCurrentUser, userList} = useContext(UserContext);
-    const [modalLogin, setModalLogin] = useState(currentUser === null || currentUser==="Guest" || userList.userList.length!==0);
+    useEffect(()=>{
+        logOutCheck();
+        }
+     ,[currentUser]);
+    const [modalLogin, setModalLogin] = useState(currentUser === null || currentUser==="Guest");
     const openLogin = () => setModalLogin(!modalLogin);
-    const [modalSignUp, setModalSignUp] = useState(userList.userList.length===0 && !modalLogin);
+    const [modalSignUp, setModalSignUp] = useState(!modalLogin && currentUser==="Guest");
 
-    const Toggle = () => setModalSignUp(!modalSignUp);
+    const Toggle = () => {setModalSignUp(!modalSignUp); openLogin()};
 
 
-    if(currentUser === null) {
+    const handleSignOut = e => {
+        e.preventDefault();
         setCurrentUser("Guest");
+        window.location.reload();
     }
 
+
+    function logOutCheck(){
+        if(currentUser !== null && currentUser!=="Guest"){
+            return  <button type="button" onClick={handleSignOut}> Logout</button>
+        }else{
+            return  <button type="button" onClick={openLogin}> Log In</button>
+        }
+    }
 
 
     return (
@@ -29,14 +43,15 @@ const SPA = () =>{
                     <SignUp modalShow={modalSignUp} handleClose={Toggle}>
                         <p>Sign up now for this amazing task manager!</p>
                     </SignUp>
-                    <LogIn modalShow={modalLogin} handleClose={openLogin}>
+                    <LogIn modalShow={modalLogin} handleClose={openLogin} handleSignUp={Toggle}>
                         <p>Log in to see your tasks!</p>
                     </LogIn>
                     <h1>Simple SPA</h1>
                     <ul className="header">
-                        <li><NavLink to="/">Home</NavLink></li>
+                        <li><NavLink to="/">Tasks</NavLink></li>
+
                         <li><NavLink to="/profile">Profile</NavLink></li>
-                        <li><NavLink to="/support">support</NavLink></li>
+                        {logOutCheck()}
                     </ul>
                     <div className="content" id="main">
 

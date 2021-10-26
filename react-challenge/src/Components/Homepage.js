@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import {ListContext, TaskList} from "./TaskList";
+import {UserContext} from "./User";
 
 
 
@@ -39,6 +40,7 @@ const Homepage = () => {
     const { taskList, setTaskList, addTask, setMarkedTask} = useContext(ListContext);
 
 
+
     return (
         <React.Fragment >
             <h1>New Task</h1>
@@ -47,7 +49,7 @@ const Homepage = () => {
 
             <TaskList />
 
-            <button onClick={() =>  {setTaskList(null) ;window.location.reload();}}>
+            <button onClick={() =>  {localStorage.clear() ;window.location.reload();}}>
                 Reset Cache
             </button>
         </React.Fragment>

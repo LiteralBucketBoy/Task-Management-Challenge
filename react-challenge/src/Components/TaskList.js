@@ -1,6 +1,7 @@
 import React, {Component, useContext, useEffect, useReducer} from "react";
 import { createSelector } from 'reselect'
 import { v4 as uuidv4 } from 'uuid';
+import {UserContext} from "./User";
 
 
 /**
@@ -47,8 +48,8 @@ const testState = {
  * */
 let reducer = (currentList, newList ) => {
     if(newList === null){
-        localStorage.removeItem("taskList"+ JSON.parse(localStorage.getItem("currentUser")));
-        return testState;
+        localStorage.removeItem("taskList");
+        return localState();
     }
     return {...currentList, ...newList};
 };
@@ -61,7 +62,10 @@ const localUser = () => {
     return userInfo!==null ? userInfo : "Guest";
 }
 
-const localState = JSON.parse(localStorage.getItem("taskList"+localUser) ); //reconverts the list back to the object
+const localState = () =>{
+   let taskListInfo = JSON.parse(localStorage.getItem("taskList"+localUser()) ); //reconverts the list back to the object
+    return taskListInfo!==null ? taskListInfo : testState;
+}
 
 
 /**
@@ -70,11 +74,17 @@ const localState = JSON.parse(localStorage.getItem("taskList"+localUser) ); //re
 function TaskListInfo (props){
     const [isHidden, setHidden] = React.useState(false)
     const [sortingStyle, setSortStyle] = React.useState("default")
-    const [taskList, setTaskList] = React.useReducer(reducer,localState || testState );//In case it doesn't have local list it will provide a default one
+    const [taskList, setTaskList] = React.useReducer(reducer,localState());//In case it doesn't have local list it will provide a default one
+    const { currentUser, setCurrentUser} = useContext(UserContext);
     useEffect(() => {
         localStorage.setItem(("taskList"+localUser()), JSON.stringify(taskList));//Stores in cache the task list
         filterList(); //updates the visual part
     }, [taskList, isHidden, sortingStyle]);
+    useEffect(() => {
+        if(currentUser !== null && currentUser !=="Guest"){
+            setTaskList( JSON.parse(localStorage.getItem("taskList"+currentUser.name) ));
+        }
+    }, [currentUser]);
 
 
     const [filteredList, setFilteredList] = React.useState(taskList.testList.filter(item => !item.archived).map(

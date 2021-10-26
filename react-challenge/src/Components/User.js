@@ -9,11 +9,21 @@ const localUserState = JSON.parse(localStorage.getItem("currentUser")); //reconv
 const localUserListState = JSON.parse(localStorage.getItem("userList")); //reconverts the list back to the object
 
 /**
+ * Feeds the state of the list
+ * */
+let reducer = (currentList, newList ) => {
+    if(newList === null){
+        localStorage.removeItem("userList");
+        return userListState;
+    }
+    return {...currentList, ...newList};
+};
+/**
  * Stores and manipulates the data of the list
  * */
 function UserInfo (props){
 
-    const [userList, setUserList] = React.useState(localUserListState || userListState)
+    const [userList, setUserList] = React.useReducer(reducer,localUserListState || userListState)
     useEffect(() => {
         localStorage.setItem("userList", JSON.stringify(userList));//Stores in cache the task list
     }, [userList]);
@@ -25,7 +35,7 @@ function UserInfo (props){
 
 
     /*
-    *  Adds a new user to the list
+    *  Adds a new user to the list, should encrypt password, but no point to it since it's localStorage and editable
     *  */
     const addUser = user => {
         setUserList(
