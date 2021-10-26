@@ -37,7 +37,8 @@ const testState = {
             archived : false,
             taskString: "Complete task"
         }
-    ]
+    ],
+    User : "Guest"
 }
 ;
 
@@ -46,7 +47,7 @@ const testState = {
  * */
 let reducer = (currentList, newList ) => {
     if(newList === null){
-        localStorage.removeItem("taskList");
+        localStorage.removeItem("taskList"+ JSON.parse(localStorage.getItem("currentUser")));
         return testState;
     }
     return {...currentList, ...newList};
@@ -55,7 +56,12 @@ let reducer = (currentList, newList ) => {
 
 const ListContext = React.createContext(); // Creates the context of the list
 
-const localState = JSON.parse(localStorage.getItem("taskList")); //reconverts the list back to the object
+const localUser = () => {
+    let userInfo = JSON.parse(localStorage.getItem("currentUser"));
+    return userInfo!==null ? userInfo : "Guest";
+}
+
+const localState = JSON.parse(localStorage.getItem("taskList"+localUser) ); //reconverts the list back to the object
 
 
 /**
@@ -66,7 +72,7 @@ function TaskListInfo (props){
     const [sortingStyle, setSortStyle] = React.useState("default")
     const [taskList, setTaskList] = React.useReducer(reducer,localState || testState );//In case it doesn't have local list it will provide a default one
     useEffect(() => {
-        localStorage.setItem("taskList", JSON.stringify(taskList));//Stores in cache the task list
+        localStorage.setItem(("taskList"+localUser()), JSON.stringify(taskList));//Stores in cache the task list
         filterList(); //updates the visual part
     }, [taskList, isHidden, sortingStyle]);
 

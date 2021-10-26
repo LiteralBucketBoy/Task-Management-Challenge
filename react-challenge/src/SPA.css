@@ -5,7 +5,7 @@ html, body {
 }
 
 h1 {
-    margin: 20px 0 15px 0;
+    margin: 0px 0 0px 0;
 }
 
 #main {
@@ -24,7 +24,7 @@ tr:hover {
 
 .form-inline .form-control {
     width: 50%;
-    margin-left: 80px;
+    margin-left: 10px;
 }
 
 .marked {
