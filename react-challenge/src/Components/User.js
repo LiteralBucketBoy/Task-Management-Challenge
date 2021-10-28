@@ -1,6 +1,5 @@
 import React, {useContext, useEffect} from "react";
 import {v4 as uuidv4} from "uuid";
-import {ListContext, TaskItem, TaskList} from "./TaskList";
 import bodyguard from "./7b7l2tt7yu9y.png"
 import "../SPA.css";
 
@@ -13,9 +12,9 @@ const UserContext = React.createContext(); // Creates the context of the user
 const localUserState = JSON.parse(localStorage.getItem("currentUser")); //reconverts the list back to the object
 const localUserListState = JSON.parse(localStorage.getItem("userList")); //reconverts the list back to the object
 
-/**
+/***
  * Feeds the state of the list
- * */
+ */
 let reducer = (currentList, newList ) => {
     if(newList === null){
         localStorage.removeItem("userList");
@@ -39,9 +38,10 @@ function UserInfo (props){
     }, [currentUser]);
 
 
-    /*
-    *  Adds a new user to the list, should encrypt password, but no point to it since it's localStorage and editable
-    *  */
+    /***
+     * Adds a new user to the list, should encrypt password, but no point to it since it's localStorage and editable
+     *
+     */
     const addUser = user => {
         setUserList(
             userList.userList.push(
@@ -59,7 +59,7 @@ function UserInfo (props){
         );
     }
 
-    /*
+    /**
    *  Adds a new user to the list, should encrypt password, but no point to it since it's localStorage and editable
    *  */
     const setUser = user => {
@@ -79,11 +79,11 @@ function UserInfo (props){
     )
 }
 
-/*
+/**
 * Creates and renders the task item that represents the task
 * */
 function UserItem ({ user }) {
-    const [userTaskList, setUserTaskList] = React.useState( )
+
 
 
     function getUserTaskList() {
@@ -153,11 +153,11 @@ function UserItem ({ user }) {
     )
 }
 
-/*
+/**
 * Creates and renders the frontend of list of tasks in a table
 * */
-function UserList ({}){
-    const { currentUser, setCurrentUser, userList, addUser} = useContext(UserContext);
+function UserList (){
+    const {userList, addUser} = useContext(UserContext);
     const [newUser, setNewUser] = React.useState({name: "", password:"", confirmPassword:""});
 
     const [userNameWarning, setUsernameWarning] =  React.useState("");
@@ -230,12 +230,16 @@ function UserList ({}){
     );
 }
 
-
+/***
+ * The NoAccess() method creates a replacement HTML page for any user that isn't Admin
+ * @returns {JSX.Element} Meme content for wrong user access
+ * @constructor
+ */
 function NoAccess() {
     return (
         <div className="content" >
             <img src={bodyguard} alt="Password for admin is password"/>
-            <br></br>
+            <br/>
             <label>Sorry chief but you ain't getting in unless you have access</label>
         </div>
     );

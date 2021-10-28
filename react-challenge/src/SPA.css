@@ -5,7 +5,7 @@ html, body {
 }
 
 h1 {
-    margin: 0px 0 0px 0;
+    margin: 0 0 0 0;
 }
 
 #main {
@@ -17,7 +17,7 @@ ul {
 }
 
 li{
-    margin: 30px 0 0px 0;
+    margin: 30px 0 0 0;
 }
 
 li a {
@@ -157,7 +157,7 @@ input{
     width: 100px;
     transition: all 0.5s;
     cursor: pointer;
-    margin: 15px 20px 0px 200px;
+    margin: 15px 20px 0 200px;
 }
 
 .logOut span {
@@ -227,12 +227,15 @@ input{
     box-shadow: 0 3px #999;
 }
 
-.addBtn:hover {background-color: #3e8e41}
+.addBtn:hover {
+    background-color: #3e8e41
+}
 
 .addBtn:active {
+    transform: translateY(2px);
     background-color: #3e8e41;
     box-shadow: 0 5px #666;
-    transform: translateY(2px);
+
 }
 
 .deleteBtn {
@@ -246,15 +249,16 @@ input{
     background-color: #af4c4c;
     border: none;
     border-radius: 5px;
-    box-shadow: 0 2px #999;
+    box-shadow: 0 2px #989898;
 }
 
-.deleteBtn:hover {background-color: #8e3e3e
+.deleteBtn:hover {
+    background-color: #8e3e3e
 }
 
 .deleteBtn:active {
     background-color: #8e3e3e;
-    box-shadow: 0 5px #666;
+    box-shadow: 0 5px #6b6b6b;
     transform: translateY(4px);
 }
 
@@ -268,14 +272,16 @@ input{
     background-color: #4c82af;
     border: none;
     border-radius: 5px;
-    box-shadow: 0 2px #999;
+    box-shadow: 0 2px #9a9a9a;
 }
 
-.editBtn:hover {background-color: #3e768e
+.editBtn:hover {
+    background-color: #3e768e
 }
 
 .editBtn:active {
-    background-color: #3e618e;
-    box-shadow: 0 5px #666;
     transform: translateY(4px);
+    background-color: #3e618e;
+    box-shadow: 0 5px #656565;
+
 }

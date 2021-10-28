@@ -1,4 +1,4 @@
-import React, {Component, useCallback, useContext, useEffect} from "react";
+import React, { useContext} from "react";
 import './modal.css';
 import {UserContext} from "../User";
 import closedeye from "./closed-eye.png";
@@ -6,8 +6,7 @@ import openeye from "./openeye.png";
 
 const SignUp = ({ modalShow,handleClose }) => {
     const toggleClass = modalShow ?  "modal display-block": "modal display-none";
-    const { currentUser, setCurrentUser, userList, addUser} = useContext(UserContext);
-    const [formIsValid, setFormValid] = React.useState(false);
+    const {  userList, addUser} = useContext(UserContext);
     const [newUser, setNewUser] = React.useState({});
 
     const [userNameWarning, setUsernameWarning] =  React.useState("");
@@ -52,11 +51,11 @@ const SignUp = ({ modalShow,handleClose }) => {
                     <label>Username</label>
                     <input key="userName" name="name" value={newUser.name} onChange={handleChange}  required/>
                     <label className="warning">{userNameWarning}</label>
-                    <br></br>
+                    <br/>
                     <label>Password</label>
                     <input type={showPassword ? "text" : "password"}  key="password" name="password" value={newUser.password} onChange={handleChange}  required/>
                     <label className="warning">{passwordWarning}</label>
-                    <br></br>
+                    <br/>
                     <label>Confirm Password</label>
                     <input type={showPassword ? "text" : "password"}  key="confirmPassword" name="confirmPassword" value={newUser.confirmPassword} onChange={handleChange}  required/>
                     <label className="warning">{passwordWarning}</label>

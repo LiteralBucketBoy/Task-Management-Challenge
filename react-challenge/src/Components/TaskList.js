@@ -1,4 +1,4 @@
-import React, {Component, useContext, useEffect, useReducer} from "react";
+import React, { useContext, useEffect} from "react";
 import { createSelector } from 'reselect'
 import { v4 as uuidv4 } from 'uuid';
 import {UserContext} from "./User";
@@ -55,7 +55,7 @@ let reducer = (currentList, newList ) => {
 };
 
 
-const ListContext = React.createContext(); // Creates the context of the list
+const ListContext = React.createContext(); /**Creates the context of the list*/
 
 const localUser = () => {
     let userInfo = JSON.parse(localStorage.getItem("currentUser"));
@@ -63,7 +63,7 @@ const localUser = () => {
 }
 
 const localState = () =>{
-   let taskListInfo = JSON.parse(localStorage.getItem("taskList"+localUser()) ); //reconverts the list back to the object
+   let taskListInfo = JSON.parse(localStorage.getItem("taskList"+localUser()) ); /**reconverts the list back to the object*/
     return taskListInfo!==null ? taskListInfo : testState;
 }
 
@@ -74,19 +74,21 @@ const localState = () =>{
 function TaskListInfo (props){
     const [isHidden, setHidden] = React.useState(false)
     const [sortingStyle, setSortStyle] = React.useState("default")
-    const [taskList, setTaskList] = React.useReducer(reducer,localState());//In case it doesn't have local list it will provide a default one
-    const { currentUser, setCurrentUser} = useContext(UserContext);
+    const [taskList, setTaskList] = React.useReducer(reducer,localState());/**In case it doesn't have local list it will provide a default one*/
+    const { currentUser} = useContext(UserContext);
+
     useEffect(() => {
-        localStorage.setItem(("taskList"+localUser()), JSON.stringify(taskList));//Stores in cache the task list
+        localStorage.setItem(("taskList"+localUser()), JSON.stringify(taskList));/**Stores in cache the task list*/
         filterList(); //updates the visual part
     }, [taskList, isHidden, sortingStyle]);
+
     useEffect(() => {
         if(currentUser !== null && currentUser !=="Guest"){
             setTaskList( JSON.parse(localStorage.getItem("taskList"+currentUser.name) ));
         }
     }, [currentUser]);
 
-    const selectTaskList = taskList => taskList
+    const selectTaskList = taskList => taskList;
 
     const [filteredList, setFilteredList] = React.useState(taskList.testList.filter(item => !item.archived).map(
         (item, index) => (
@@ -97,35 +99,23 @@ function TaskListInfo (props){
             />
         )))
 
+    /***
+     * Switches the sorting style accordingly
+     */
+    const sortStyles = (a,b)=>{
+        if(sortingStyle==="default"){
+            return   a.dateAdded > b.dateAdded ? 1 : -1
+        }else if (sortingStyle==="A-Z"){
+            return  a.taskString > b.taskString ? 1 : -1
+        }else if (sortingStyle==="Z-A"){
+            return  a.taskString < b.taskString ? 1 : -1
+        }
+        return 0;}
+
+
     const selectNonArchived = createSelector(selectTaskList, testList =>
-        testList.filter(item => !item.archived).sort(
-            (a,b)=>{
-                if(sortingStyle==="default"){
-                    return   a.dateAdded > b.dateAdded ? 1 : -1
-                }else if (sortingStyle==="A-Z"){
-                    return  a.taskString > b.taskString ? 1 : -1
-                }else if (sortingStyle==="Z-A"){
-                    return  a.taskString < b.taskString ? 1 : -1
-                }
-                return 0;}).map(
-            (item, index) => (
-                <TaskItem
-                    key={item.uniqueId}
-                    index={index}
-                    task={item}
-                />
-            )))
-    const selectNonComplete = createSelector(selectTaskList, testList =>
-        testList.filter(item => !item.archived && item.isMarked===false).sort(
-            (a,b)=>{
-                if(sortingStyle==="default"){
-                    return   a.dateAdded > b.dateAdded ? 1 : -1
-                }else if (sortingStyle==="A-Z"){
-                    return  a.taskString > b.taskString ? 1 : -1
-                }else if (sortingStyle==="Z-A"){
-                    return  a.taskString < b.taskString ? 1 : -1
-                }
-                return 0;}).map(
+        testList.filter(item => !item.archived).sort(sortStyles
+            ).map(
             (item, index) => (
                 <TaskItem
                     key={item.uniqueId}
@@ -134,6 +124,21 @@ function TaskListInfo (props){
                 />
             )))
 
+
+    const selectNonComplete = createSelector(selectTaskList, testList =>
+        testList.filter(item => !item.archived && item.isMarked===false).sort(
+            sortStyles).map(
+            (item, index) => (
+                <TaskItem
+                    key={item.uniqueId}
+                    index={index}
+                    task={item}
+                />
+            )))
+
+    /***
+     * Sets the filtered list when completed tasks are toggled
+     * */
     function filterList ()  {
         if(isHidden === true){
             setFilteredList(selectNonComplete(taskList.testList))
@@ -141,7 +146,7 @@ function TaskListInfo (props){
             setFilteredList(selectNonArchived(taskList.testList))
         }
     }
-    /*
+    /**
     *  Adds a new task to the list, visually in the bottom of the list
     *  */
     const addTask = task => {
@@ -160,15 +165,15 @@ function TaskListInfo (props){
         );
     }
 
-    /*
+    /**
     *  Finds and marks the task as complete
     *  */
-    const setMarkedTask = (id, checked) => {
+    const setMarkedTask = (id) => {
         const newList = {testList : taskList.testList.map(t => t.uniqueId === id ? {...t, isMarked: !t.isMarked, dateModified: Date.now()} : t)};
         setTaskList(newList);
     }
 
-    /*
+    /**
     *  Sets the new string of the edit form on the task
     *  */
     const setTask = (id, string) => {
@@ -176,14 +181,14 @@ function TaskListInfo (props){
 
     }
 
-    /*
+    /**
     *  Sets the task to archived to eventually delete it
     *  */
     const archiveTask = (id) => {
         setTaskList({testList :taskList.testList.map(t => t.uniqueId === id ? {...t, archived: true, dateModified: Date.now()} : t)});
 
     }
-    /*
+    /**
     * Deletes the task from the list
     * */
     const deleteTask = (id) => {
@@ -201,25 +206,25 @@ function TaskListInfo (props){
 }
 
 
-/*
+/**
 * Creates and renders the task item that represents the task
 * */
 function TaskItem ({ task }) {
-    const { setMarkedTask, setTask, archiveTask,deleteTask } = useContext(ListContext);
+    const { setMarkedTask, setTask, archiveTask } = useContext(ListContext);
 
-    const [isEditing, setIsEditing] = React.useState(false); //This is to check if the task is being edited, default is false because it must only be true if the user attempts to edit
+    const [isEditing, setIsEditing] = React.useState(false); /**This is to check if the task is being edited, default is false because it must only be true if the user attempts to edit*/
 
-    const [taskString, setTaskString] = React.useState(task.taskString);//This is to guide the string to be handled
+    const [taskString, setTaskString] = React.useState(task.taskString);/**This is to guide the string to be handled*/
 
-    /*
+    /**
     * Handles the event from submitting a new task string
     * */
     const handleNewTaskString = e => {
         e.preventDefault();
         if(taskString!==""){
-            setIsEditing(false) //Once submitted it is presumed the user is also done editing the task
+            setIsEditing(false) /**Once submitted it is presumed the user is also done editing the task*/
             setTask(task.uniqueId,taskString);
-        };
+        }
     }
 
     return (
@@ -253,7 +258,7 @@ function TaskItem ({ task }) {
                 <button className="editBtn" onClick={()=> setIsEditing(true)}>
                     Edit task
                 </button>
-                <button className="deleteBtn" onClick={ e => archiveTask(task.uniqueId)}>
+                <button className="deleteBtn" onClick={ () => archiveTask(task.uniqueId)}>
                     Delete task
                 </button>
             </td>
@@ -265,14 +270,14 @@ function TaskItem ({ task }) {
 
 
 
-/*
+/**
 * Creates and renders the frontend of list of tasks in a table
 * */
-function TaskList ({user}){
-    const { filteredList, setFilteredList, isHidden, setHidden, sortingStyle, setSortStyle} = useContext(ListContext);
+function TaskList (){
+    const { filteredList, isHidden, setHidden, sortingStyle, setSortStyle} = useContext(ListContext);
 
 
-    /*
+    /**
     * Handles the event for sorting
     * */
     const handleSort = e => {
@@ -307,7 +312,7 @@ function TaskList ({user}){
             </label>
             <input type="checkbox"
                    value={isHidden}
-                   onChange={e=> setHidden(!isHidden)}
+                   onChange={()=> setHidden(!isHidden)}
             />
         </table>
 

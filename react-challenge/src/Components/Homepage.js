@@ -13,7 +13,7 @@ function TaskForm({addTask}){
             addTask(task);
             setTask("");
 
-        };
+        }
     }
     return (
         <form className="addTask" onSubmit={handleNewTask}>
@@ -36,7 +36,7 @@ function TaskForm({addTask}){
 
 
 const Homepage = () => {
-    const { taskList, setTaskList, addTask, setMarkedTask} = useContext(ListContext);
+    const {  addTask} = useContext(ListContext);
 
 
 

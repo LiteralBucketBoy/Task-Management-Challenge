@@ -1,4 +1,4 @@
-import React, {Component, useContext, useEffect} from "react";
+import React, { useContext} from "react";
 import './modal.css';
 import {UserContext} from "../User";
 import openeye from "./openeye.png";
@@ -6,7 +6,7 @@ import closedeye from "./closed-eye.png";
 
 const LogIn = ({ modalShow, handleClose, handleSignUp }) => {
     const toggleClass = modalShow ? "modal display-block": "modal display-none";
-    const { currentUser, setCurrentUser, userList} = useContext(UserContext);
+    const {  setCurrentUser, userList} = useContext(UserContext);
 
     const [logData, setLogData] = React.useState({password:""});
 
@@ -58,7 +58,7 @@ const LogIn = ({ modalShow, handleClose, handleSignUp }) => {
                     <label>Password</label>
                     <input type={showPassword ? "text" : "password"}  key="password" name="password" value={logData.password} onChange={handleChange}  required/>
                     <button  type="button" className="showPasswordBtn"  onClick={toggleShow}><img className="showPassword" alt="Show Password" src={showPassword ? openeye : closedeye}/> </button>
-                    <br></br>
+                    <br/>
                     <label className="warning">{logWarning}</label>
 
                     <button className="signInBtn" type="button" onClick={handleSubmit}>

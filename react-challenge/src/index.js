@@ -6,13 +6,11 @@ import SPA from "./SPA";
 import {UserInfo} from "./Components/User";
 
 
-
-
 ReactDOM.render(
   <React.StrictMode>
       <div className="App" >
           <UserInfo>
-              <SPA></SPA>
+              <SPA/>
           </UserInfo>
       </div>
   </React.StrictMode>,

@@ -1,5 +1,5 @@
 import {UserContext} from "./User";
-import React, {useContext, useEffect} from "react";
+import React, {useContext} from "react";
 import openeye from "./UserData/openeye.png";
 import closedeye from "./UserData/closed-eye.png";
 
@@ -8,7 +8,7 @@ import closedeye from "./UserData/closed-eye.png";
 
 
 const Profile = () => {
-    const { currentUser, setCurrentUser, userList, setUser} = useContext(UserContext);
+    const { currentUser, userList, setUser} = useContext(UserContext);
     const [saveWarning, setSaveWarning] =  React.useState("");
     const [passwordWarning, setPasswordWarning] =  React.useState("");
     const [newUser, setNewUser] = React.useState({name:currentUser});
@@ -35,12 +35,17 @@ const Profile = () => {
 
     const handleChange = e =>
         setNewUser(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
+
     const [showPassword, setshowPassword] = React.useState(false);
 
     const toggleShow = () => {
         setshowPassword(!showPassword);
     };
 
+    /***
+     * Checks if user isn't in Guest Mode, which doesn't have the same functionalities
+     * @returns {JSX.Element} Elements that provide Password change functionalities
+     */
     function guestCheck(){
         if(currentUser !== null && currentUser!=="Guest"){
             return <><h1 className=""> Change your password</h1>

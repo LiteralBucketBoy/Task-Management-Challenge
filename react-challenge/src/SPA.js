@@ -1,5 +1,5 @@
-import React, {Component, useContext, useEffect, useReducer, useState} from "react";
-import {Route, NavLink, HashRouter, useLocation, Switch, BrowserRouter, useHistory, Link} from "react-router-dom";
+import React, { useContext, useEffect,  useState} from "react";
+import {Route,   useLocation, Switch, BrowserRouter,  Link} from "react-router-dom";
 import Homepage from "./Components/Homepage";
 import Profile from "./Components/Profile"
 import "./SPA.css";
@@ -9,27 +9,34 @@ import SignUp from "./Components/UserData/SignUp";
 import LogIn from "./Components/UserData/LogIn";
 import Logo from "./Components/logo192.png"
 
-
+/**
+* Replaces the default App, defines and renders a SPA
+* */
 const SPA = () =>{
-    const { currentUser, setCurrentUser, userList} = useContext(UserContext);
+    const { currentUser, setCurrentUser} = useContext(UserContext);
     useEffect(()=>{
         logOutCheck();
         }
      ,[currentUser]);
+
     const [modalLogin, setModalLogin] = useState(currentUser === null || currentUser==="Guest");
-    const openLogin = () => setModalLogin(!modalLogin);
     const [modalSignUp, setModalSignUp] = useState(!modalLogin && currentUser==="Guest");
+    const openLogin = () => setModalLogin(!modalLogin); /**toggles the login Modal**/
+    const Toggle = () => {setModalSignUp(!modalSignUp); openLogin()}; /**toggles the signup modal, switching from login*/
 
-    const Toggle = () => {setModalSignUp(!modalSignUp); openLogin()};
-
-
+    /**
+    * If user logs out, sets to Guest Mode as default
+    * */
     const handleSignOut = e => {
         e.preventDefault();
         setCurrentUser("Guest");
         window.location.reload();
     }
 
-
+    /**
+     * Switches the button for login if user logs out and vice-versa
+     * @returns JSX.Element list item for login/logout
+     * */
     function logOutCheck(){
         if(currentUser !== null && currentUser!=="Guest"){
             return  <li className="logOut" type="button" onClick={handleSignOut}> <span>Log out </span></li>
@@ -37,20 +44,26 @@ const SPA = () =>{
             return  <li className="logOut" type="button" onClick={openLogin}><span>Login </span></li>
         }
     }
- ;
+
+    /***
+     * Checks if user is Admin, adding a new tab in the navbar
+     * @returns JSX.Element list item with the link for the users tab
+     */
     function isAdminGiveLink(){
         return currentUser==="Admin" ? <li className={activeTab === 4 ? "navbar--link-item active" : ""} onClick={()=>onTabChange(4)}><Link to="/users">Users</Link></li> : "";
     }
 
     const [activeTab, setActiveTab] = React.useState(1);
 
+    /***
+     * Sets the tab as active
+     * @param tab integer that represents the tab selected
+     */
     function onTabChange(tab){
         setActiveTab(tab);
     }
 
     return (
-
-
             <BrowserRouter>
                 <main>
                 <nav className="navbar">
@@ -64,7 +77,6 @@ const SPA = () =>{
                     <LogIn modalShow={modalLogin} handleClose={openLogin} handleSignUp={Toggle}>
                         <p>Log in to see your tasks!</p>
                     </LogIn>
-
                     <ul className="navbar--link">
                         <li className={activeTab === 1 ? "active" : ""} onClick={()=>onTabChange(1)}><Link to="/">Tasks</Link></li>
                         <li className={activeTab === 2 ? "active" : ""} onClick={()=>onTabChange(2)}><Link to="/Profile">Profile</Link></li>
@@ -76,10 +88,15 @@ const SPA = () =>{
                 </main>
             </BrowserRouter>
         );
-
 }
+
+/**
+ * Loads the Routes for the components
+ * @returns {JSX.Element}
+ * @constructor
+ */
 function LoadPage() {
-    const { currentUser, setCurrentUser, userList} = useContext(UserContext);
+    const { currentUser} = useContext(UserContext);
     const currentPage = useLocation();
     const [showingPage, setShowingPage] = useState(currentPage);
     const [fade, setFade] = useState("slideIn");
@@ -89,6 +106,10 @@ function LoadPage() {
 
     }, [currentPage]);
 
+    /***
+     * Checks if user is Admin and provides the adequate component
+     * @returns {(function(): *)|*}  component: UserList or NoAccess
+     */
     function isAdminGivePage(){
         return currentUser==="Admin" ? UserList : NoAccess;
     }
