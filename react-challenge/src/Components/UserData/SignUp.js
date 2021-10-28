@@ -1,8 +1,8 @@
 import React, {Component, useCallback, useContext, useEffect} from "react";
 import './modal.css';
 import {UserContext} from "../User";
-import {AES} from "crypto-js";
-
+import closedeye from "./closed-eye.png";
+import openeye from "./openeye.png";
 
 const SignUp = ({ modalShow,handleClose }) => {
     const toggleClass = modalShow ?  "modal display-block": "modal display-none";
@@ -39,21 +39,37 @@ const SignUp = ({ modalShow,handleClose }) => {
 
     const handleChange = e =>
         setNewUser(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
+    const [showPassword, setshowPassword] = React.useState(false);
 
+    const toggleShow = () => {
+        setshowPassword(!showPassword);
+    };
     return (
         <div id="signup" className={toggleClass}>
             <section className="modal-main">
-                <form onSubmit={handleSubmit}>
-                    <input key="userName" name="name" value={newUser.name} onChange={handleChange}  required/> <label className="warning">{userNameWarning}</label>
-                    <input key="password" name="password" value={newUser.password} onChange={handleChange}  required/> <label className="warning">{passwordWarning}</label>
-                    <input key="confirmPassword" name="confirmPassword" value={newUser.confirmPassword} onChange={handleChange}  required/> <label className="warning">{passwordWarning}</label>
-                    <button type="button" onClick={handleSubmit}>
+                <form className="form-box" onSubmit={handleSubmit}>
+                    <h1 className=""> Sign Up</h1>
+                    <label>Username</label>
+                    <input key="userName" name="name" value={newUser.name} onChange={handleChange}  required/>
+                    <label className="warning">{userNameWarning}</label>
+                    <br></br>
+                    <label>Password</label>
+                    <input type={showPassword ? "text" : "password"}  key="password" name="password" value={newUser.password} onChange={handleChange}  required/>
+                    <label className="warning">{passwordWarning}</label>
+                    <br></br>
+                    <label>Confirm Password</label>
+                    <input type={showPassword ? "text" : "password"}  key="confirmPassword" name="confirmPassword" value={newUser.confirmPassword} onChange={handleChange}  required/>
+                    <label className="warning">{passwordWarning}</label>
+                    <button type="button" className="showPasswordsBtn" onClick={toggleShow}><img className="showPassword" alt="Show Password" src={showPassword ? openeye : closedeye}/></button>
+                    <button className="signInBtn" type="button" onClick={handleSubmit}>
                         Sign up
                     </button>
                 </form>
-                <button type="button" onClick={handleClose}>
+                <div  className="form-box">
+                <button  className="signInBtn" type="button" onClick={handleClose}>
                     Log in
                 </button>
+                </div>
             </section>
         </div>
     );

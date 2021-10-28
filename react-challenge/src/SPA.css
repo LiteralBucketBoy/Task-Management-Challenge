@@ -9,8 +9,6 @@ h1 {
 }
 
 #main {
-    width: 600px;
-    margin: 0 auto;
     text-align: left;
 }
 
@@ -18,8 +16,35 @@ ul {
     list-style: none;
 }
 
+li{
+    margin: 30px 0 0px 0;
+}
+
+li a {
+    color: #cbcbcb;
+    padding: 16px 16px;
+    text-decoration: none;
+    background-color: #1c1c1c;
+    border-radius: 1px 1px 1px 1px;
+}
+
+li a.active {
+    background-color: #4f4f4f;
+    padding: 16px 16px;
+    color: #cbcbcb;
+}
+
+li a:hover:not(.active) {
+    background-color: #555;
+    color: white;
+}
+
 tr:hover {
     background-color: #4e4e4e;
+}
+td {
+    text-align: center;
+    padding: 2px 2px 2px 2px;
 }
 
 .form-inline .form-control {
@@ -28,7 +53,7 @@ tr:hover {
 }
 
 .marked {
-    color: rgb(255, 0, 0);
+    color: rgb(145, 85, 85);
     text-decoration: line-through;
 }
 
@@ -38,4 +63,219 @@ tr:hover {
 
 .icon {
     margin: 6px 10px 6px 0;
+}
+
+.navbar {
+    display: inline-flex;
+    position: fixed;
+    align-items: center;
+    padding: 0.5rem 2.5rem;
+    width: 100%;
+    justify-content: space-evenly;
+    z-index: 1;
+    background: #181818;
+    top: 0;
+    left: 0;
+    box-shadow: 1px 1px 1px #222;
+}
+
+
+.navbar--logo {
+    width: 2rem;
+    height: 2rem;
+    margin-right: 0.5rem;
+    border-radius: 20px 20px 20px 20px;
+}
+
+.navbar--logo-holder {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+
+.navbar--link {
+    display: inline-flex;
+    list-style: none;
+}
+
+
+.navbar--link-item  {
+    cursor: pointer;
+}
+
+.content {
+    display: block;
+    padding: 10rem;
+    width: 50rem;
+    margin-left: auto;
+    margin-right: auto;
+
+}
+
+.content-items {
+    margin: 5px 5px 5px 5px;
+}
+
+.contentProfile {
+    display: block;
+    padding: 10rem;
+    width: 50rem;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+
+}
+
+.addUser{
+    display: block;
+    align-items: center;
+
+    justify-content: space-evenly;
+}
+
+.addTask{
+    margin: 5px 5px 5px 5px;
+}
+
+input{
+    border: 2px solid rgba(128, 128, 128, 0.5);
+    border-radius: 4px;
+    margin: 5px 5px 5px 5px;
+    background-color: #808080;
+
+}
+
+.logOut {
+    border-radius: 4px;
+    background-color: #1c1c1c;
+    border: none;
+    color: #cbcbcb;
+    text-align: center;
+    font-size: 15px;
+    padding: 16px 16px;
+    width: 100px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 15px 20px 0px 200px;
+}
+
+.logOut span {
+    cursor: pointer;
+    display: inline-flex;
+    position: relative;
+    transition: 0.5s;
+}
+
+.logOut span:after {
+    content: '\00bb';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -20px;
+    transition: 0.5s;
+}
+
+.logOut:hover span {
+    padding-right: 25px;
+}
+
+.logOut:hover span:after {
+    opacity: 1;
+    right: 0;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translate(-20px, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate(0px, 0px);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translate(0px, 0px);
+    }
+    to {
+        transform: translate(-20px, 0);
+        opacity: 0;
+    }
+}
+
+.slideIn {
+    animation: 0.25s slideIn forwards;
+}
+
+.slideOut {
+    animation: 0.25s slideOut forwards;
+}
+
+.addBtn {
+    display: inline-block;
+    padding: 5px 5px;
+    cursor: pointer;
+    text-align: center;
+    color: #3b3b3b;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 3px #999;
+}
+
+.addBtn:hover {background-color: #3e8e41}
+
+.addBtn:active {
+    background-color: #3e8e41;
+    box-shadow: 0 5px #666;
+    transform: translateY(2px);
+}
+
+.deleteBtn {
+    display: inline-block;
+    padding: 5px 5px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #2d2d2d;
+    background-color: #af4c4c;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 2px #999;
+}
+
+.deleteBtn:hover {background-color: #8e3e3e
+}
+
+.deleteBtn:active {
+    background-color: #8e3e3e;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+}
+
+
+.editBtn {
+    display: inline-block;
+    padding: 5px 5px;
+    cursor: pointer;
+    text-align: center;
+    color: #2f2f2f;
+    background-color: #4c82af;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 2px #999;
+}
+
+.editBtn:hover {background-color: #3e768e
+}
+
+.editBtn:active {
+    background-color: #3e618e;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
 }

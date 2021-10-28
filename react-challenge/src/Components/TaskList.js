@@ -86,6 +86,7 @@ function TaskListInfo (props){
         }
     }, [currentUser]);
 
+    const selectTaskList = taskList => taskList
 
     const [filteredList, setFilteredList] = React.useState(taskList.testList.filter(item => !item.archived).map(
         (item, index) => (
@@ -96,32 +97,9 @@ function TaskListInfo (props){
             />
         )))
 
-    function filterList ()  {
-        if(isHidden === true){
-            setFilteredList( taskList.testList.filter(item => !item.archived && item.isMarked===false)
-                .sort(
-                (a,b)=>{
-                    if(sortingStyle==="default"){
-                        return   a.dateAdded > b.dateAdded ? 1 : -1
-                    }else if (sortingStyle==="A-Z"){
-                        return  a.taskString > b.taskString ? 1 : -1
-                    }else if (sortingStyle==="Z-A"){
-                        return  a.taskString < b.taskString ? 1 : -1
-                    }
-                    return 0;
-                }
-            ).map(
-                (item, index) => (
-                    <TaskItem
-                        key={item.uniqueId}
-                        index={index}
-                        task={item}
-                    />
-                )))
-        }else {
-            setFilteredList(taskList.testList.filter(item => !item.archived)
-                .sort(
-                (a,b)=>{
+    const selectNonArchived = createSelector(selectTaskList, testList =>
+        testList.filter(item => !item.archived).sort(
+            (a,b)=>{
                 if(sortingStyle==="default"){
                     return   a.dateAdded > b.dateAdded ? 1 : -1
                 }else if (sortingStyle==="A-Z"){
@@ -129,15 +107,38 @@ function TaskListInfo (props){
                 }else if (sortingStyle==="Z-A"){
                     return  a.taskString < b.taskString ? 1 : -1
                 }
-                return 0;
-            }).map(
-                (item, index) => (
-                    <TaskItem
-                        key={item.uniqueId}
-                        index={index}
-                        task={item}
-                    />
-                )))
+                return 0;}).map(
+            (item, index) => (
+                <TaskItem
+                    key={item.uniqueId}
+                    index={index}
+                    task={item}
+                />
+            )))
+    const selectNonComplete = createSelector(selectTaskList, testList =>
+        testList.filter(item => !item.archived && item.isMarked===false).sort(
+            (a,b)=>{
+                if(sortingStyle==="default"){
+                    return   a.dateAdded > b.dateAdded ? 1 : -1
+                }else if (sortingStyle==="A-Z"){
+                    return  a.taskString > b.taskString ? 1 : -1
+                }else if (sortingStyle==="Z-A"){
+                    return  a.taskString < b.taskString ? 1 : -1
+                }
+                return 0;}).map(
+            (item, index) => (
+                <TaskItem
+                    key={item.uniqueId}
+                    index={index}
+                    task={item}
+                />
+            )))
+
+    function filterList ()  {
+        if(isHidden === true){
+            setFilteredList(selectNonComplete(taskList.testList))
+        }else {
+            setFilteredList(selectNonArchived(taskList.testList))
         }
     }
     /*
@@ -249,10 +250,10 @@ function TaskItem ({ task }) {
                 <div>{new Date(task.dateAdded).toUTCString()}</div>
             </td>
             <td>
-                <button onClick={()=> setIsEditing(true)}>
+                <button className="editBtn" onClick={()=> setIsEditing(true)}>
                     Edit task
                 </button>
-                <button onClick={ e => archiveTask(task.uniqueId)}>
+                <button className="deleteBtn" onClick={ e => archiveTask(task.uniqueId)}>
                     Delete task
                 </button>
             </td>
@@ -267,8 +268,9 @@ function TaskItem ({ task }) {
 /*
 * Creates and renders the frontend of list of tasks in a table
 * */
-function TaskList ({}){
+function TaskList ({user}){
     const { filteredList, setFilteredList, isHidden, setHidden, sortingStyle, setSortStyle} = useContext(ListContext);
+
 
     /*
     * Handles the event for sorting
@@ -312,7 +314,6 @@ function TaskList ({}){
 
     )
 }
-
 
 
 export { TaskItem, ListContext, TaskListInfo, TaskList}

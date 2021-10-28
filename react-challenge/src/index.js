@@ -5,9 +5,12 @@ import reportWebVitals from './reportWebVitals';
 import SPA from "./SPA";
 import {UserInfo} from "./Components/User";
 
+
+
+
 ReactDOM.render(
   <React.StrictMode>
-      <div className="App">
+      <div className="App" >
           <UserInfo>
               <SPA></SPA>
           </UserInfo>

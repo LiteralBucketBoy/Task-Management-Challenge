@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import {ListContext, TaskList} from "./TaskList";
-import {UserContext} from "./User";
 
 
 
@@ -17,7 +16,7 @@ function TaskForm({addTask}){
         };
     }
     return (
-        <form onSubmit={handleNewTask}>
+        <form className="addTask" onSubmit={handleNewTask}>
             <input
                 type="text"
                 className="input"
@@ -26,7 +25,7 @@ function TaskForm({addTask}){
                 onChange={e => setTask(e.target.value)}
                 required
             />
-            <button onClick={()=> e => setTask(e.target.value)}>
+            <button className="addBtn" onClick={()=> e => setTask(e.target.value)}>
             Add task
             </button>
         </form>
@@ -43,15 +42,15 @@ const Homepage = () => {
 
     return (
         <React.Fragment >
-            <h1>New Task</h1>
-            <TaskForm addTask={addTask}>  </TaskForm>
-            <h1>Tasks</h1>
+            <section className="content">
+            <h1 className="content-items">New Task</h1>
+            <TaskForm className="content-items" addTask={addTask}>  </TaskForm>
+            <h1 className="content-items">Tasks</h1>
 
-            <TaskList />
+            <TaskList className="content-items" />
 
-            <button onClick={() =>  {localStorage.clear() ;window.location.reload();}}>
-                Reset Cache
-            </button>
+
+            </section>
         </React.Fragment>
     );
 };
