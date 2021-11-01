@@ -3,46 +3,50 @@ import { createSelector } from 'reselect'
 import { v4 as uuidv4 } from 'uuid';
 import {UserContext} from "./User";
 
+async function fetchData ()  {
+    const response = await fetch('/tasks');
+    const body = response.json();
 
+    return body;
+}
 /**
  * Some default tasks
  */
 const testState = {
-    testList: [
-        {
-            index : 0,
-            uniqueId : "t-" + uuidv4(),
-            isMarked : true,
-            dateAdded : Date.now(),
-            dateModified : Date.now(),
-            archived : false,
-            taskString: "Add new task"
-        },
+        testList: [
+            {
+                index : 0,
+                uniqueId : "t-" + uuidv4(),
+                isMarked : true,
+                dateAdded : Date.now(),
+                dateModified : Date.now(),
+                archived : false,
+                taskString: "Add new task"
+            },
 
-        {
-            index : 1,
-            uniqueId : "t-"+ uuidv4(),
-            isMarked : false,
-            dateAdded : Date.now(),
-            dateModified : Date.now(),
-            archived : false,
-            taskString: "Edit task"
-        },
+            {
+                index : 1,
+                uniqueId : "t-"+ uuidv4(),
+                isMarked : false,
+                dateAdded : Date.now(),
+                dateModified : Date.now(),
+                archived : false,
+                taskString: "Edit task"
+            },
 
-        {
-            index : 2,
-            uniqueId : "t-" + uuidv4(),
-            isMarked : false,
-            dateAdded : Date.now(),
-            dateModified : Date.now(),
-            archived : false,
-            taskString: "Complete task"
-        }
-    ],
-    User : "Guest"
-}
+            {
+                index : 2,
+                uniqueId : "t-" + uuidv4(),
+                isMarked : false,
+                dateAdded : Date.now(),
+                dateModified : Date.now(),
+                archived : false,
+                taskString: "Complete task"
+            }
+        ],
+        User : "Guest"
+    }
 ;
-
 /**
  * Feeds the state of the list
  * */
@@ -62,7 +66,7 @@ const localUser = () => {
     return userInfo!==null ? userInfo : "Guest";
 }
 
-const localState = () =>{
+ function  localState (){
    let taskListInfo = JSON.parse(localStorage.getItem("taskList"+localUser()) ); /**reconverts the list back to the object*/
     return taskListInfo!==null ? taskListInfo : testState;
 }
@@ -74,11 +78,12 @@ const localState = () =>{
 function TaskListInfo (props){
     const [isHidden, setHidden] = React.useState(false)
     const [sortingStyle, setSortStyle] = React.useState("default")
-    const [taskList, setTaskList] = React.useReducer(reducer,localState());/**In case it doesn't have local list it will provide a default one*/
+    const [taskList, setTaskList] = React.useReducer(reducer, localState());/**In case it doesn't have local list it will provide a default one*/
     const { currentUser} = useContext(UserContext);
 
     useEffect(() => {
         localStorage.setItem(("taskList"+localUser()), JSON.stringify(taskList));/**Stores in cache the task list*/
+
         filterList(); //updates the visual part
     }, [taskList, isHidden, sortingStyle]);
 
@@ -90,7 +95,7 @@ function TaskListInfo (props){
 
     const selectTaskList = taskList => taskList;
 
-    const [filteredList, setFilteredList] = React.useState(taskList.testList.filter(item => !item.archived).map(
+    const [filteredList, setFilteredList] = React.useState( taskList.testList.filter(item => !item.archived).map(
         (item, index) => (
             <TaskItem
                 key={item.uniqueId}
@@ -149,20 +154,27 @@ function TaskListInfo (props){
     /**
     *  Adds a new task to the list, visually in the bottom of the list
     *  */
-    const addTask = task => {
-        setTaskList(
-            taskList.testList.push(
-                {
-                    index : taskList.testList.length,
-                    uniqueId : "t-" + uuidv4(),
-                    isMarked : false,
-                    dateAdded : Date.now(),
-                    dateModified : Date.now(),
-                    archived : false,
-                    taskString: "" + task
+    async function addTask(task) {
+            await fetch('/tasks', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    index: taskList.testList.length,
+                    description: "" + task
+                }),
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8"
                 }
-            )
-        );
+            }).then(response =>
+                response.json()
+            ).then(json =>{
+                setTaskList(
+                taskList.testList.push(
+                    json
+                )
+            );
+            })
+
+
     }
 
     /**
@@ -247,7 +259,7 @@ function TaskItem ({ task }) {
                                 <input type="text" className="input" defaultValue={task.taskString} onChange={ e => setTaskString(e.target.value)}/>
 
                             </form>
-                            : <div onDoubleClick ={()=> setIsEditing(true)}>{task.taskString}</div>
+                            : <div onDoubleClick ={ ()=> task.isMarked ? null : setIsEditing(true)}>{task.taskString}</div>
                     }
                     </div>
             </td>
@@ -255,7 +267,7 @@ function TaskItem ({ task }) {
                 <div>{new Date(task.dateAdded).toUTCString()}</div>
             </td>
             <td>
-                <button className="editBtn" onClick={()=> setIsEditing(true)}>
+                <button className={ task.isMarked ? "editBtn-m" : "editBtn"} disabled={task.isMarked} onClick={()=> setIsEditing(true)}>
                     Edit task
                 </button>
                 <button className="deleteBtn" onClick={ () => archiveTask(task.uniqueId)}>

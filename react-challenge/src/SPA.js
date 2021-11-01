@@ -13,6 +13,8 @@ import Logo from "./Components/logo192.png"
 * Replaces the default App, defines and renders a SPA
 * */
 const SPA = () =>{
+
+
     const { currentUser, setCurrentUser} = useContext(UserContext);
     useEffect(()=>{
         logOutCheck();
@@ -85,6 +87,7 @@ const SPA = () =>{
                     </ul>
                 </nav>
                 <LoadPage/>
+
                 </main>
             </BrowserRouter>
         );
