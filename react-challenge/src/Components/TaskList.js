@@ -3,12 +3,7 @@ import { createSelector } from 'reselect'
 import { v4 as uuidv4 } from 'uuid';
 import {UserContext} from "./User";
 
-async function fetchData ()  {
-    const response = await fetch('/tasks');
-    const body = response.json();
 
-    return body;
-}
 /**
  * Some default tasks
  */
@@ -81,10 +76,10 @@ function TaskListInfo (props){
     const [taskList, setTaskList] = React.useReducer(reducer, localState());/**In case it doesn't have local list it will provide a default one*/
     const { currentUser} = useContext(UserContext);
 
-    useEffect(() => {
-        localStorage.setItem(("taskList"+localUser()), JSON.stringify(taskList));/**Stores in cache the task list*/
+    useEffect(()=> {
+        localStorage.setItem(("taskList" + localUser()), JSON.stringify(taskList));/**Stores in cache the task list*/
 
-        filterList(); //updates the visual part
+         filterList(); //updates the visual part
     }, [taskList, isHidden, sortingStyle]);
 
     useEffect(() => {
@@ -95,14 +90,14 @@ function TaskListInfo (props){
 
     const selectTaskList = taskList => taskList;
 
-    const [filteredList, setFilteredList] = React.useState( taskList.testList.filter(item => !item.archived).map(
+    const [filteredList, setFilteredList] = React.useState( /*taskList.testList.filter(item => !item.archived).map(
         (item, index) => (
             <TaskItem
                 key={item.uniqueId}
                 index={index}
                 task={item}
             />
-        )))
+        ))*/)
 
     /***
      * Switches the sorting style accordingly
@@ -144,18 +139,36 @@ function TaskListInfo (props){
     /***
      * Sets the filtered list when completed tasks are toggled
      * */
-    function filterList ()  {
+    async function filterList ()  {
         if(isHidden === true){
-            setFilteredList(selectNonComplete(taskList.testList))
+            await fetch('/todos?filter=INCOMPLETE', {
+                method: 'GET',
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+            }).then(response =>
+                response.json()
+            ).then(json =>{
+                setFilteredList(selectNonComplete(json.testList))
+            })
         }else {
-            setFilteredList(selectNonArchived(taskList.testList))
+            await fetch('/todos', {
+                method: 'GET',
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+            }).then(response =>
+                response.json()
+            ).then(json =>{
+                setFilteredList(selectNonArchived(json.testList))
+            })
         }
     }
     /**
     *  Adds a new task to the list, visually in the bottom of the list
     *  */
     async function addTask(task) {
-            await fetch('/tasks', {
+            await fetch('/todos', {
                 method: 'PUT',
                 body: JSON.stringify({
                     index: taskList.testList.length,
@@ -180,16 +193,42 @@ function TaskListInfo (props){
     /**
     *  Finds and marks the task as complete
     *  */
-    const setMarkedTask = (id) => {
-        const newList = {testList : taskList.testList.map(t => t.uniqueId === id ? {...t, isMarked: !t.isMarked, dateModified: Date.now()} : t)};
-        setTaskList(newList);
+    async function setMarkedTask (id, value) {
+        await fetch('/todo/'+id, {
+            method: 'PATCH',
+            body: JSON.stringify({
+                isMarked: value
+            }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        }).then(response =>
+            response.json()
+        ).then(json =>{
+            setTaskList({testList : taskList.testList.map(t => t.uniqueId === id ? {...t, isMarked: json.isMarked, dateModified: Date.now()} : t)});
+
+        })
+
     }
 
     /**
     *  Sets the new string of the edit form on the task
     *  */
-    const setTask = (id, string) => {
-        setTaskList({testList :taskList.testList.map(t => t.uniqueId === id ? {...t, taskString: string, dateModified: Date.now()} : t)});
+    async function setTask(id, string) {
+        await fetch('/todo/'+id, {
+            method: 'PATCH',
+            body: JSON.stringify({
+                description: string
+            }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        }).then(response =>
+            response.json()
+        ).then(json =>{
+            setTaskList({testList :taskList.testList.map(t => t.uniqueId === id ? {...t, taskString: json.description, dateModified: Date.now()} : t)});
+        })
+
 
     }
 
@@ -203,8 +242,16 @@ function TaskListInfo (props){
     /**
     * Deletes the task from the list
     * */
-    const deleteTask = (id) => {
-        setTaskList({testList :taskList.testList.filter(t => t.uniqueId !== id)});
+    async function deleteTask(id){
+        await fetch('/todo/'+id, {
+            method: 'DELETE',
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        }).then(response =>
+            setTaskList({testList :taskList.testList.filter(t => t.uniqueId !== id)})
+        )
+
     }
 
 
@@ -222,7 +269,7 @@ function TaskListInfo (props){
 * Creates and renders the task item that represents the task
 * */
 function TaskItem ({ task }) {
-    const { setMarkedTask, setTask, archiveTask } = useContext(ListContext);
+    const { setMarkedTask, setTask, archiveTask, deleteTask} = useContext(ListContext);
 
     const [isEditing, setIsEditing] = React.useState(false); /**This is to check if the task is being edited, default is false because it must only be true if the user attempts to edit*/
 
@@ -270,7 +317,7 @@ function TaskItem ({ task }) {
                 <button className={ task.isMarked ? "editBtn-m" : "editBtn"} disabled={task.isMarked} onClick={()=> setIsEditing(true)}>
                     Edit task
                 </button>
-                <button className="deleteBtn" onClick={ () => archiveTask(task.uniqueId)}>
+                <button className="deleteBtn" onClick={ () => deleteTask(task.uniqueId)}>
                     Delete task
                 </button>
             </td>
