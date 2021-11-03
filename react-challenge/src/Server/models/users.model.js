@@ -1,42 +1,37 @@
 
-const Joi = require('joi');
+const knex = require('knex')
+const connection = require('../knex-config')
+const {Model} = require("objection");
+const {Task} = require("./tasks.model");
 
-const userSchema = Joi.object({
-    userName: Joi.string()
-        .alphanum()
-        .min(3)
-        .max(30)
-        .required(),
+const knexConnect = knex(connection);
 
-    password: Joi.string()
-        .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
+// Give the knex instance to objection.
+Model.knex(knexConnect);
 
-    repeat_password: Joi.ref('password'),
-
-    access_token: [
-        Joi.string(),
-        Joi.number()
-    ],
-
-})
-    .with('username', 'password')
-    .xor('password', 'access_token')
-    .with('password', 'repeat_password');
-
-
-schema.validate({ username: 'abc', birth_year: 1994 });
-// -> { value: { username: 'abc', birth_year: 1994 } }
-
-schema.validate({});
-// -> { value: {}, error: '"username" is required' }
-
-// Also -
-
-try {
-    const value = await taskSchema.validateAsync({ username: 'abc', birth_year: 1994 });
+// Person model.
+class User extends Model {
+    static get tableName() {
+        return 'users';
+    }
+    static get idColumn() {
+        return 'uniqueId';
+    }
+    static get relationMappings() {
+        return {
+            tasks: {
+                relation: Model.HasManyRelation,
+                modelClass: Task,
+                join: {
+                    from: 'users.uniqueId',
+                    to: 'tasks.ownerId'
+                }
+            }
+        };
+    }
 }
-catch (err) { }
 
-module.exports = [
-    userSchema
-]
+
+module.exports = {
+    User,
+}

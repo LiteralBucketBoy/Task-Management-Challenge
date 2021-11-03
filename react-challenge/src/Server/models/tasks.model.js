@@ -1,20 +1,35 @@
+const knex = require('knex')
+const connection = require('../knex-config')
+const {Model} = require("objection");
+const {User} = require("./users.model");
 
-const Joi = require('joi');
+const knexConnect = knex(connection);
 
-const taskSchema = Joi.object({
-    index: Joi.number().integer().min(0).required(),
-    uniqueId : Joi.string().required(),
-    isMarked : Joi.boolean().required(),
-    dateAdded : Joi.date().required(),
-    dateModified : Joi.date().required(),
-    archived :  Joi.boolean().required(),
-    taskString: Joi.string()
-        .min(5)
-        .max(50)
-        .required(),
-})
+// Give the knex instance to objection.
+Model.knex(knexConnect);
 
+// Task model.
+class Task extends Model {
+    static get tableName() {
+        return 'tasks';
+    }
+    static get idColumn() {
+        return 'uniqueId';
+    }
+    static get relationMappings() {
+        return {
+            owner: {
+                relation: Model.BelongsToOneRelation,
+                modelClass: User,
+                join: {
+                    from: 'tasks.ownerId',
+                    to: 'users.uniqueId'
+                }
+            }
+        };
+    }
+}
 
 module.exports = {
-    taskSchema
+    Task
 }
