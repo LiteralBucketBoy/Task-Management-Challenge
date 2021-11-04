@@ -14,8 +14,24 @@ const LogIn = ({ modalShow, handleClose, handleSignUp }) => {
 
     const handleSubmit = e => {
         e.preventDefault();
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ logData })
+        };
         if(logData.name!==null || logData.name!== "" ){
             setLogWarning("");
+            fetch('/login', requestOptions)
+                .then(response => {
+                    response
+                })
+                .then(user => {
+                    setCurrentUser(user.name);
+                    setLogWarning("");
+                    setLogData({});
+                    handleClose();
+                    return user;
+                });
             if(userList.userList.filter(item => item.userName === logData.name).length===0){
                 setLogWarning("Username doesn't exist")
             }else{
@@ -24,9 +40,7 @@ const LogIn = ({ modalShow, handleClose, handleSignUp }) => {
 
                 if(logData.password !== "" && logData.password===user.password){
                     setCurrentUser(logData.name);
-                    setLogWarning("");
-                    setLogData({});
-                    handleClose();
+
                 }else{
                     setLogWarning("Password is incorrect");
                 }

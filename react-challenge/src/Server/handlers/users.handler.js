@@ -1,26 +1,25 @@
 const {v4: uuidv4} = require("uuid");
+const {User} = require("../models/users.model");
 
-const getTasks = (req,h) => {
-    let newList = [];
-    let filter = req.query.filter;
-    let order = (a,b)=> a.dateAdded < b.dateAdded ? 1 : -1;
-
-    if(req.query.orderBy === 'DESCRIPTION'){
-        order = (a,b)=> a.taskString > b.taskString ? 1 : -1
-    }
-
-    if(filter === 'COMPLETE'){
-        return {testList: testState.testList.filter(item => !item.archived && item.isMarked===true).sort(order)}
-    }else if(filter === 'INCOMPLETE'){
-        return {testList: testState.testList.filter(item => !item.archived && item.isMarked===false).sort(order)}
-    }else{
-        return {testList: testState.testList.filter(item => !item.archived).sort(order)};
-    }
-
-
+const login = (req,h) => {
+    const response = h.response({text: 'You used a Token!'});
+    response.header("Authorization", req.headers.authorization);
+    return response;
 }
 
-const addTask = (req,h) => {
+const logout = (req,h) => {
+    const response = h.response({text: 'You used a Token!'});
+    response.header("Authorization", req.headers.authorization);
+    return response;
+}
+
+const getUsers = (req,h) => {
+    const response = h.response({text: 'You used a Token!'});
+    response.header("Authorization", req.headers.authorization);
+    return response;
+}
+
+const addUser = (req,h) => {
 
     const body =  {
         index : req.payload.index,
@@ -36,7 +35,7 @@ const addTask = (req,h) => {
 }
 
 
-const editTask = (req,h) => {
+const editUser = (req,h) => {
     let body = {} ;
     if(req.payload.isMarked!==null && req.payload.isMarked!==undefined ){
         body =  {
@@ -56,15 +55,10 @@ const editTask = (req,h) => {
 }
 
 
-const deleteTask = (req,h) => {
-    testState = {testList :testState.testList.filter(t => t.uniqueId !== req.params.id)};
-    return {}
-}
-
-
 module.exports = {
-    addTask,
-    getTasks,
-    editTask,
-    deleteTask,
+    login,
+    logout,
+    addUser,
+    getUsers,
+    editUser,
 };
