@@ -55,6 +55,7 @@ function UserInfo (props){
                 user: user
             }),
             headers: {
+                "Authorization" : currentToken,
                 "Content-type": "application/json; charset=UTF-8"
             }
         }).then(response =>
@@ -80,6 +81,7 @@ function UserInfo (props){
                 userPassword: user.newPassword
             }),
             headers: {
+                "Authorization" : currentToken,
                 "Content-type": "application/json; charset=UTF-8"
             }
         }).then(response =>
@@ -105,14 +107,14 @@ function UserInfo (props){
 /**
 * Creates and renders the task item that represents the task
 * */
-function UserItem ({ user }) {
+function UserItem ({ user, tasks }) {
+    const {userList} = useContext(UserContext);
+     function getUserTaskList() {
 
-    function getUserTaskList() {
-
-            const userTasks = JSON.parse(localStorage.getItem("taskList"+user));
-            if(userTasks!== null) {
-                if (userTasks.testList !== undefined) {
-                    return userTasks.testList.map(
+            console.log(tasks)
+            if(tasks!== null) {
+                if (tasks !== undefined) {
+                    return tasks.map(
                         (item, index) => (
                             <tr key={index} className="task-item">
 
@@ -178,14 +180,41 @@ function UserItem ({ user }) {
 * Creates and renders the frontend of list of tasks in a table
 * */
 function UserList (){
-    const {userList, addUser} = useContext(UserContext);
+    const {userList, addUser, setUserList, currentToken, currentUser} = useContext(UserContext);
     const [newUser, setNewUser] = React.useState({name: "", password:"", confirmPassword:""});
-
+    const [userTaskList, setUserTaskList] = React.useState();
     const [userNameWarning, setUsernameWarning] =  React.useState("");
     const [passwordWarning, setPasswordWarning] =  React.useState("");
 
-    const handleSubmit = e => {
+
+    const fetchData = React.useCallback(async() => {
+            await fetch('/users/'+currentUser, {
+                method: 'GET',
+                headers: {
+                    "Authorization" : currentToken,
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+            }).then(response =>
+                response.json()
+            ).then(json => {
+                setUserTaskList(json.userList.map(
+                    (item, index)  => (
+                        <UserItem
+                            key={item.uniqueId}
+                            index={index}
+                            user={item.userName}
+                            tasks={item.taskList}
+                        />
+                    ) ))
+            })
+    }, [])
+    React.useEffect(async() => {
+        await fetchData()
+    }, [fetchData, userList])
+
+    const handleSubmit = async e => {
         e.preventDefault();
+
         console.log(newUser.name)
         if( newUser.name!==undefined || newUser.name!==""){
             setUsernameWarning("");
@@ -212,6 +241,7 @@ function UserList (){
     const handleChange = e =>
         setNewUser(prevState =>  ({ ...prevState, [e.target.name]: e.target.value }));
 
+
     return (
         <div className="content" id={"newUser"}>
             <h1>New User</h1>
@@ -236,14 +266,7 @@ function UserList (){
                 </thead>
                 <tbody className="user-list">
                 {
-                    userList.userList.map(
-                    (item, index) => (
-                    <UserItem
-                    key={item.uniqueId}
-                    index={index}
-                    user={item.userName}
-                    />
-                    ))
+                    userTaskList
                 }
                 </tbody>
             </table>

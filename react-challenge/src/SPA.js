@@ -15,7 +15,7 @@ import Logo from "./Components/logo192.png"
 const SPA = () =>{
 
 
-    const { currentUser, setCurrentUser} = useContext(UserContext);
+    const { currentUser, setCurrentUser,currentToken, setCurrentToken} = useContext(UserContext);
     useEffect(()=>{
         logOutCheck();
         }
@@ -29,10 +29,22 @@ const SPA = () =>{
     /**
     * If user logs out, sets to Guest Mode as default
     * */
-    const handleSignOut = e => {
+    const handleSignOut = async e => {
         e.preventDefault();
-        setCurrentUser("Guest");
-        window.location.reload();
+        const requestOptions = {
+            method: 'POST',
+            headers: { "Authorization" : currentToken, 'Content-Type': 'application/json' },
+        };
+        await fetch('/logout', requestOptions)
+            .then(response =>
+                response.json()
+            ).then(json => {
+            setCurrentUser("Guest");
+            setCurrentToken('');
+            console.log(json)
+            window.location.reload();
+        })
+
     }
 
     /**

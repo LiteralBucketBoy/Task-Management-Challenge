@@ -18,7 +18,7 @@ module.exports = [
     },
     {
         method: 'GET',
-        path:'/users',
+        path:'/users/{userName}',
         handler: userHandler.getUsers,
 
     },
