@@ -9,9 +9,10 @@ const taskSchema = Joi.object({
     dateModified : Joi.date().required(),
     archived :  Joi.boolean().required(),
     taskString: Joi.string()
-        .min(5)
+        .min(1)
         .max(50)
         .required(),
+    ownerId: Joi.string().required(),
 })
 
 

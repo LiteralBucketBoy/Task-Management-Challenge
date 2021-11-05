@@ -6,7 +6,7 @@ import closedeye from "./closed-eye.png";
 
 const LogIn = ({ modalShow, handleClose, handleSignUp }) => {
     const toggleClass = modalShow ? "modal display-block": "modal display-none";
-    const {  setCurrentUser, userList} = useContext(UserContext);
+    const {  setCurrentUser, userList, setCurrentToken, currentToken} = useContext(UserContext);
 
     const [logData, setLogData] = React.useState({password:""});
 
@@ -22,29 +22,31 @@ const LogIn = ({ modalShow, handleClose, handleSignUp }) => {
         if(logData.name!==null || logData.name!== "" ){
             setLogWarning("");
             fetch('/login', requestOptions)
-                .then(response => {
-                    response
-                })
-                .then(user => {
-                    setCurrentUser(user.name);
+                .then(response =>
+                    response.json()
+                ).then(json => {
+                    setCurrentUser(logData.name);
+                    setCurrentToken(json.token);
                     setLogWarning("");
                     setLogData({});
                     handleClose();
-                    return user;
-                });
-            if(userList.userList.filter(item => item.userName === logData.name).length===0){
-                setLogWarning("Username doesn't exist")
-            }else{
-                setLogWarning("");
-                const user = userList.userList.find(item => item.userName === logData.name)
-
-                if(logData.password !== "" && logData.password===user.password){
-                    setCurrentUser(logData.name);
-
+                    return json;
+                }).catch(err => {
+                if(userList.userList.filter(item => item.userName === logData.name).length===0){
+                    setLogWarning("Username doesn't exist")
                 }else{
-                    setLogWarning("Password is incorrect");
+                    setLogWarning("");
+                    const user = userList.userList.find(item => item.userName === logData.name)
+
+                    if(logData.password !== "" && logData.password===user.password){
+                        setCurrentUser(logData.name);
+
+                    }else{
+                        setLogWarning("Password is incorrect");
+                    }
                 }
-            }
+            });
+
         }else{
             setLogWarning("Login invalid")
         }

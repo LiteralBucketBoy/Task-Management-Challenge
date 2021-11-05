@@ -74,12 +74,12 @@ function TaskListInfo (props){
     const [isHidden, setHidden] = React.useState(false)
     const [sortingStyle, setSortStyle] = React.useState("default")
     const [taskList, setTaskList] = React.useReducer(reducer, localState());/**In case it doesn't have local list it will provide a default one*/
-    const { currentUser} = useContext(UserContext);
+    const { currentUser, currentToken} = useContext(UserContext);
 
     useEffect(()=> {
         localStorage.setItem(("taskList" + localUser()), JSON.stringify(taskList));/**Stores in cache the task list*/
 
-         filterList(); //updates the visual part
+         filterList().then() ; //updates the visual part
     }, [taskList, isHidden, sortingStyle]);
 
     useEffect(() => {
@@ -141,52 +141,80 @@ function TaskListInfo (props){
      * */
     async function filterList ()  {
         if(isHidden === true){
-            await fetch('/todos?filter=INCOMPLETE', {
-                method: 'GET',
-                headers: {
-                    "Content-type": "application/json; charset=UTF-8"
-                }
-            }).then(response =>
-                response.json()
-            ).then(json =>{
-                setFilteredList(selectNonComplete(json.testList))
-            })
+            if(currentUser === "Guest"){
+                setFilteredList(selectNonComplete(testState.testList))
+            }else {
+                await fetch('/todos/'+currentUser+'?filter=INCOMPLETE', {
+                    method: 'GET',
+                    headers: {
+                        "Authorization" : currentToken,
+                        "Content-type": "application/json; charset=UTF-8"
+                    }
+                }).then(response =>
+                    response.json()
+                ).then(json =>{
+                    setFilteredList(selectNonComplete(json.testList))
+                })
+            }
+
         }else {
-            await fetch('/todos', {
-                method: 'GET',
-                headers: {
-                    "Content-type": "application/json; charset=UTF-8"
-                }
-            }).then(response =>
-                response.json()
-            ).then(json =>{
-                setFilteredList(selectNonArchived(json.testList))
-            })
+            if(currentUser === "Guest"){
+                setFilteredList(selectNonArchived(testState.testList))
+            }else {
+                await fetch('/todos/'+currentUser, {
+                    method: 'GET',
+                    headers: {
+                        "Authorization" : currentToken,
+                        "Content-type": "application/json; charset=UTF-8"
+                    }
+                }).then(response =>
+                    response.json()
+                ).then(json => {
+                    setFilteredList(selectNonArchived(json.testList))
+                })
+            }
         }
     }
     /**
     *  Adds a new task to the list, visually in the bottom of the list
     *  */
     async function addTask(task) {
-            await fetch('/todos', {
+
+        if(currentUser === "Guest"){
+            setTaskList(
+                taskList.testList.push(
+                    {
+                        index : taskList.testList.length,
+                        uniqueId : "t-" + uuidv4(),
+                        isMarked : false,
+                        dateAdded : Date.now(),
+                        dateModified : Date.now(),
+                        archived : false,
+                        taskString: task.taskString
+                    }
+                )
+            );
+        }else {
+            await fetch('/todos/'+currentUser, {
                 method: 'PUT',
                 body: JSON.stringify({
                     index: taskList.testList.length,
                     description: "" + task
                 }),
                 headers: {
+                    "Authorization" : currentToken,
                     "Content-type": "application/json; charset=UTF-8"
                 }
             }).then(response =>
                 response.json()
-            ).then(json =>{
+            ).then(json => {
                 setTaskList(
-                taskList.testList.push(
-                    json
-                )
-            );
-            })
-
+                    taskList.testList.push(
+                        json
+                    )
+                );
+            }).catch(e => console.log(e))
+        }
 
     }
 
@@ -194,41 +222,76 @@ function TaskListInfo (props){
     *  Finds and marks the task as complete
     *  */
     async function setMarkedTask (id, value) {
-        await fetch('/todo/'+id, {
-            method: 'PATCH',
-            body: JSON.stringify({
-                isMarked: value
-            }),
-            headers: {
-                "Content-type": "application/json; charset=UTF-8"
-            }
-        }).then(response =>
-            response.json()
-        ).then(json =>{
-            setTaskList({testList : taskList.testList.map(t => t.uniqueId === id ? {...t, isMarked: json.isMarked, dateModified: Date.now()} : t)});
+        if(currentUser === "Guest"){
+            setTaskList({
+                testList: taskList.testList.map(t => t.uniqueId === id ? {
+                    ...t,
+                    isMarked: !t.isMarked,
+                    dateModified: Date.now()
+                } : t)
+            });
+        }else {
+            await fetch('/todo/' + id, {
+                method: 'PATCH',
+                body: JSON.stringify({
+                    isMarked: value,
+                    userName: currentUser
+                }),
+                headers: {
+                    "Authorization" : currentToken,
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+            }).then(response =>
+                response.json()
+            ).then(json => {
+                setTaskList({
+                    testList: taskList.testList.map(t => t.uniqueId === id ? {
+                        ...t,
+                        isMarked: json.isMarked,
+                        dateModified: Date.now()
+                    } : t)
+                });
 
-        })
-
+            }).catch(err => console.log(err))
+        }
     }
 
     /**
     *  Sets the new string of the edit form on the task
     *  */
     async function setTask(id, string) {
-        await fetch('/todo/'+id, {
-            method: 'PATCH',
-            body: JSON.stringify({
-                description: string
-            }),
-            headers: {
-                "Content-type": "application/json; charset=UTF-8"
-            }
-        }).then(response =>
-            response.json()
-        ).then(json =>{
-            setTaskList({testList :taskList.testList.map(t => t.uniqueId === id ? {...t, taskString: json.description, dateModified: Date.now()} : t)});
-        })
-
+        if(currentUser === "Guest"){
+            setTaskList({
+                testList: taskList.testList.map(t => t.uniqueId === id ? {
+                    ...t,
+                    taskString: string,
+                    dateModified: Date.now(),
+                    userName: currentUser
+                } : t)
+            });
+        }else {
+            await fetch('/todo/' + id, {
+                method: 'PATCH',
+                body: JSON.stringify({
+                    description: string,
+                    userName: currentUser
+                }),
+                headers: {
+                    "Authorization" : currentToken,
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+            }).then(response =>
+                response.json()
+            ).then(json => {
+                setTaskList({
+                    testList: taskList.testList.map(t => t.uniqueId === id ? {
+                        ...t,
+                        taskString: json.description,
+                        dateModified: Date.now()
+                    } : t)
+                });
+            })
+        }
 
     }
 
@@ -243,15 +306,19 @@ function TaskListInfo (props){
     * Deletes the task from the list
     * */
     async function deleteTask(id){
-        await fetch('/todo/'+id, {
-            method: 'DELETE',
-            headers: {
-                "Content-type": "application/json; charset=UTF-8"
-            }
-        }).then(response =>
-            setTaskList({testList :taskList.testList.filter(t => t.uniqueId !== id)})
-        )
-
+        if(currentUser === "Guest"){
+            setTaskList({testList: taskList.testList.filter(t => t.uniqueId !== id)});
+        }else {
+            await fetch('/todo/' + id, {
+                method: 'DELETE',
+                headers: {
+                    "Authorization" : currentToken,
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+            }).then(response =>
+                setTaskList({testList: taskList.testList.filter(t => t.uniqueId !== id)})
+            )
+        }
     }
 
 

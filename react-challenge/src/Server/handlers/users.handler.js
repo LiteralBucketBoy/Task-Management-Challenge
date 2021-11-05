@@ -1,10 +1,25 @@
 const {v4: uuidv4} = require("uuid");
 const {User} = require("../models/users.model");
+const JWT   = require('jsonwebtoken');
 
-const login = (req,h) => {
-    const response = h.response({text: 'You used a Token!'});
-    response.header("Authorization", req.headers.authorization);
-    return response;
+const login = async (req, h) => {
+    const user = await User.query().select('userName','password').where('userName', req.payload.logData.name);
+    if(!user){
+        return h.response('').code(404);
+    }
+    const passwordCheck = await (req.payload.logData.password === user[0].password);
+    if(!passwordCheck){
+        return h.response('').code(401);
+    }
+    const token = new Promise(resolve => {
+        JWT.sign(req.payload.logData.name,'NeverShareYourSecret', function(err, token){
+        if(err){
+            throw new Error('ERR_INVALID_TOKEN')
+        }
+        resolve(token)
+    })})
+   return {token: await token}
+
 }
 
 const logout = (req,h) => {

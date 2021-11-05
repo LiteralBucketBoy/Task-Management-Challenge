@@ -7,8 +7,7 @@ const taskModel = require('../schemas/tasks.schema')
 module.exports = [
     {
         method: 'GET',
-        path:'/todos',
-        config: { auth: 'jwt' },
+        path:'/todos/{userName}/{filter?}',
         handler: taskHandler.getTasks,
         options: {
             response: {
@@ -19,8 +18,7 @@ module.exports = [
     },
     {
         method: 'PUT',
-        path: '/todos',
-        config: { auth: 'jwt' },
+        path: '/todos/{userName}',
         handler: taskHandler.addTask,
         options: {
             response: {
@@ -33,14 +31,12 @@ module.exports = [
     {
         method: 'PATCH',
         path: '/todo/{id}',
-        config: { auth: 'jwt' },
-        handler: taskHandler.editTask,
+        handler: taskHandler.editTask
 
     },
     {
         method: 'DELETE',
         path: '/todo/{id}',
-        config: { auth: 'jwt' },
         handler: taskHandler.deleteTask
     },
 

@@ -11,7 +11,7 @@ const userListState = {
 const UserContext = React.createContext(); // Creates the context of the user
 const localUserState = JSON.parse(localStorage.getItem("currentUser")); //reconverts the list back to the object
 const localUserListState = JSON.parse(localStorage.getItem("userList")); //reconverts the list back to the object
-
+const localToken = JSON.parse(localStorage.getItem("currentToken"));
 /***
  * Feeds the state of the list
  */
@@ -38,42 +38,65 @@ function UserInfo (props){
     }, [currentUser]);
 
 
+    const [currentToken, setCurrentToken] = React.useState(localToken);
+    useEffect(() => {
+        localStorage.setItem("currentToken", JSON.stringify(currentToken));
+    }, [currentToken]);
+
     /***
      * Adds a new user to the list, should encrypt password, but no point to it since it's localStorage and editable
      *
      */
-    const addUser = user => {
-        setUserList(
-            userList.userList.push(
-                {
-                    index : userList.userList.length,
-                    uniqueId : "u-" + uuidv4(),
-                    dateAdded : Date.now(),
-                    dateModified : Date.now(),
-                    archived : false,
-                    isAdmin : user.isAdmin,
-                    password: user.password,
-                    userName: "" + user.name
-                }
-            )
-        );
+    async function addUser(user){
+        await fetch('/users', {
+            method: 'PUT',
+            body: JSON.stringify({
+                index: userList.userList.length,
+                user: user
+            }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        }).then(response =>
+            response.json()
+        ).then(json => {
+            setUserList(
+                userList.userList.push(
+                    {
+                        json
+                    }
+                )
+            );
+        });
     }
 
     /**
    *  Adds a new user to the list, should encrypt password, but no point to it since it's localStorage and editable
    *  */
-    const setUser = user => {
-
-        setUserList({
+    async function setUser(user){
+        await fetch('/user'+user.name, {
+            method: 'PATCH',
+            body: JSON.stringify({
+                userPassword: user.newPassword
+            }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        }).then(response =>
+            response.json()
+        ).then(json => {
+            setUserList({
             userList : userList.userList.map
             (t => t.userName === user.name ? {...t, password: user.newPassword, dateModified: Date.now()}
                 : t)
+            });
         });
+
     }
 
     return(
         <UserContext.Provider
-            value={{currentUser, setCurrentUser, userList, setUserList, addUser, setUser}}> {props.children}
+            value={{currentUser, setCurrentUser, userList, setUserList, addUser, setUser, currentToken, setCurrentToken}}> {props.children}
         </UserContext.Provider>
 
     )
@@ -83,8 +106,6 @@ function UserInfo (props){
 * Creates and renders the task item that represents the task
 * */
 function UserItem ({ user }) {
-
-
 
     function getUserTaskList() {
 
