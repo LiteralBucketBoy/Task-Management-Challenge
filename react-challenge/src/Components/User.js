@@ -47,8 +47,9 @@ function UserInfo (props){
      * Adds a new user to the list, should encrypt password, but no point to it since it's localStorage and editable
      *
      */
-    async function addUser(user){
-        await fetch('/users', {
+    async function addUser(user,setNewUser,setUsernameWarning,setPasswordWarning,handleClose){
+        const checkSignup = (currentUser==="Guest") ? "/signUp" : "";
+        await fetch('/users'+checkSignup, {
             method: 'PUT',
             body: JSON.stringify({
                 index: userList.userList.length,
@@ -58,9 +59,18 @@ function UserInfo (props){
                 "Authorization" : currentToken,
                 "Content-type": "application/json; charset=UTF-8"
             }
-        }).then(response =>
-            response.json()
-        ).then(json => {
+        }).then(response => {
+            if(response.status === 409){
+                setUsernameWarning("Username already exists");
+            }else{
+                setUsernameWarning("");
+                setPasswordWarning("");
+                setNewUser({name: "", password:"", confirmPassword:""});
+                handleClose();
+                response.json()
+            }
+
+        }).then(json => {
             setUserList(
                 userList.userList.push(
                     {
@@ -75,23 +85,16 @@ function UserInfo (props){
    *  Adds a new user to the list, should encrypt password, but no point to it since it's localStorage and editable
    *  */
     async function setUser(user){
-        await fetch('/user'+user.name, {
+         await fetch('/user/'+user.name, {
             method: 'PATCH',
             body: JSON.stringify({
-                userPassword: user.newPassword
+                userPassword: user.newPassword,
+                userOldPassword: user.oldPassword
             }),
             headers: {
                 "Authorization" : currentToken,
                 "Content-type": "application/json; charset=UTF-8"
             }
-        }).then(response =>
-            response.json()
-        ).then(json => {
-            setUserList({
-            userList : userList.userList.map
-            (t => t.userName === user.name ? {...t, password: user.newPassword, dateModified: Date.now()}
-                : t)
-            });
         });
 
     }
@@ -110,41 +113,30 @@ function UserInfo (props){
 function UserItem ({ user, tasks }) {
     const {userList} = useContext(UserContext);
      function getUserTaskList() {
-
-            console.log(tasks)
             if(tasks!== null) {
                 if (tasks !== undefined) {
                     return tasks.map(
                         (item, index) => (
                             <tr key={index} className="task-item">
-
                                 <td>
-
                                     <input type="checkbox"
                                            defaultChecked={item.isMarked}
                                            value={item.isMarked}
                                            disabled={true}
                                     />
-
                                 </td>
                                 <td>
                                     <div className={item.isMarked ? "marked" : ""}>
-
-
                                         {item.taskString}
-
                                     </div>
                                 </td>
                                 <td>
                                     <div>{new Date(item.dateAdded).toUTCString()}</div>
                                 </td>
-
                             </tr>
                         ))
                 }
             }
-
-
     }
 
     return (
@@ -167,11 +159,8 @@ function UserItem ({ user, tasks }) {
                         getUserTaskList()
                     }
                     </tbody>
-
                 </table>
-
             </td>
-
         </tr>
     )
 }
@@ -185,7 +174,6 @@ function UserList (){
     const [userTaskList, setUserTaskList] = React.useState();
     const [userNameWarning, setUsernameWarning] =  React.useState("");
     const [passwordWarning, setPasswordWarning] =  React.useState("");
-
 
     const fetchData = React.useCallback(async() => {
             await fetch('/users/'+currentUser, {
@@ -208,14 +196,13 @@ function UserList (){
                     ) ))
             })
     }, [])
+
     React.useEffect(async() => {
         await fetchData()
     }, [fetchData, userList])
 
     const handleSubmit = async e => {
         e.preventDefault();
-
-        console.log(newUser.name)
         if( newUser.name!==undefined || newUser.name!==""){
             setUsernameWarning("");
             if(userList.userList.filter(item => item.userName === newUser.name).length>0){
@@ -223,11 +210,7 @@ function UserList (){
             }else{
                 setUsernameWarning("");
                 if(newUser.password === newUser.confirmPassword && newUser.password!==""){
-                    addUser(newUser);
-                    setUsernameWarning("");
-                    setPasswordWarning("");
-                    setNewUser({name: "", password:"", confirmPassword:""});
-
+                    addUser(newUser,setNewUser,setUsernameWarning,setPasswordWarning)
                 }else{
                     setPasswordWarning("Passwords don't match");
                 }

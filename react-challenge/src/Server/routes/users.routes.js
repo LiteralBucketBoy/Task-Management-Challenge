@@ -8,8 +8,19 @@ module.exports = [
     {
         method: 'POST',
         path:'/login',
-        config: { auth: false },
         handler: userHandler.login,
+        options: {
+            auth: false,
+            validate: {
+                payload: Joi.object({
+                    logData: {
+                        name: Joi.string(),
+                        password: Joi.string()
+                    },
+
+                })
+            }
+        }
     },
     {
         method: 'POST',
@@ -25,6 +36,14 @@ module.exports = [
     {
         method: 'PUT',
         path: '/users',
+        handler: userHandler.addUser,
+
+
+    },
+    {
+        method: 'PUT',
+        path: '/users/signUp',
+        config: { auth: false },
         handler: userHandler.addUser,
 
 

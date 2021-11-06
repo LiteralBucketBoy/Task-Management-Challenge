@@ -60,10 +60,18 @@ const editTask = async (req,h) => {
         };
         taskPatches = {...taskPatches, taskString: req.payload.description}
     }
+    const task = await Task.query().findById(req.params.id);
+    if(!task){
+        return h.response(body).code(404)
+    }else if((task.isMarked && !body.isMarked) || !task.isMarked)
+    {
+        const taskPatched = await Task.query().findById(req.params.id).patch(taskPatches);
+        console.log(taskPatched)
+    }else{
+        return h.response(body).code(400)
+    }
 
-    const tasks = await Task.query().findById(req.params.id).patch(taskPatches);
-    console.log(tasks)
-    return body
+        return body
 }
 
 

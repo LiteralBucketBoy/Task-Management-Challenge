@@ -65,23 +65,18 @@ const addUser = async (req,h) => {
 }
 
 
-const editUser = (req,h) => {
-    let body = {} ;
-    if(req.payload.isMarked!==null && req.payload.isMarked!==undefined ){
-        body =  {
-            uniqueId : req.params.id,
-            isMarked : !JSON.parse(req.payload.isMarked),
-        };
-        testState = {testList: testState.testList.map(t => t.uniqueId === req.params.id ? {...t, isMarked: !t.isMarked, dateModified: Date.now()} : t)}
-    }else{
-        body =  {
-            uniqueId : req.params.id,
-            taskString: ""+req.payload.description
-        };
-        testState = {testList :testState.testList.map(t => t.uniqueId ===  req.params.id ? {...t, taskString: req.payload.description, dateModified: Date.now()} : t)}
-    }
+const editUser = async (req,h) => {
 
-    return body
+    const patchUser = {password: req.payload.userPassword}
+    const user = await User.query()
+        .select('userName','password')
+        .where('userName', req.params.userName)
+        .where('password',req.payload.userOldPassword)
+        .patch(patchUser);
+    if(!user){
+        return h.response('OLDPASSWORD').code(401);
+    }
+    return user
 }
 
 

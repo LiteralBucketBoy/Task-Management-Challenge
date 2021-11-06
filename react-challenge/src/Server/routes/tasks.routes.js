@@ -10,9 +10,13 @@ module.exports = [
         path:'/todos/{userName}/{filter?}',
         handler: taskHandler.getTasks,
         options: {
-            response: {
-                schema: Joi.object({testList: Joi.array().items(taskModel.taskSchema)})
-
+            validate: {
+                params: Joi.object({
+                    userName: Joi.string()
+                }),
+                query: Joi.object({
+                    orderBy: Joi.string()
+                })
             }
         }
     },
@@ -21,23 +25,45 @@ module.exports = [
         path: '/todos/{userName}',
         handler: taskHandler.addTask,
         options: {
-            response: {
-                schema: taskModel.taskSchema
-
+            validate: {
+                params: Joi.object({
+                    userName: Joi.string()
+                }),
+                payload: Joi.object({
+                    index: Joi.number().min(0),
+                    description: Joi.string()
+                })
+            }
+        }
+    },
+    {
+        method: 'PATCH',
+        path: '/todo/{id}',
+        handler: taskHandler.editTask,
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: Joi.string()
+                }),
+                payload: Joi.object({
+                    isMarked: Joi.boolean(),
+                    description: Joi.string()
+                })
             }
         }
 
     },
     {
-        method: 'PATCH',
-        path: '/todo/{id}',
-        handler: taskHandler.editTask
-
-    },
-    {
         method: 'DELETE',
         path: '/todo/{id}',
-        handler: taskHandler.deleteTask
+        handler: taskHandler.deleteTask,
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: Joi.string()
+                }),
+            }
+        }
     },
 
 ]

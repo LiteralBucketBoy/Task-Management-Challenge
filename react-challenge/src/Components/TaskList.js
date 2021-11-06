@@ -361,7 +361,7 @@ function TaskItem ({ task }) {
                 <input type="checkbox"
                        defaultChecked={task.isMarked}
                        value={task.isMarked}
-                       onChange={e=> setMarkedTask(task.uniqueId, e.target.value)}
+                       onChange={e=> {setMarkedTask(task.uniqueId, e.target.value);  setIsEditing(false);}}
                 />
 
             </td>

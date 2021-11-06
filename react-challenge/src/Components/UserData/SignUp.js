@@ -16,16 +16,13 @@ const SignUp = ({ modalShow,handleClose }) => {
         e.preventDefault();
         if(newUser.name!==null || newUser.name!== "" ){
             setUsernameWarning("");
+
             if(userList.userList.filter(item => item.userName === newUser.name).length>0){
                 setUsernameWarning("Username already exists")
             }else{
                 setUsernameWarning("");
                 if(newUser.password === newUser.confirmPassword){
-                    addUser(newUser);
-                    setUsernameWarning("");
-                    setPasswordWarning("");
-                    setNewUser({});
-                    handleClose();
+                    addUser(newUser,setNewUser,setUsernameWarning,setPasswordWarning,handleClose);
                 }else{
                     setPasswordWarning("Passwords don't match");
                 }

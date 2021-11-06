@@ -1,7 +1,7 @@
 import React, { useContext, useEffect,  useState} from "react";
 import {Route,   useLocation, Switch, BrowserRouter,  Link} from "react-router-dom";
 import Homepage from "./Components/Homepage";
-import Profile from "./Components/Profile"
+import Profile from "./Components/UserData/Profile"
 import "./SPA.css";
 import {TaskListInfo} from "./Components/TaskList";
 import {NoAccess, UserContext, UserList} from "./Components/User";

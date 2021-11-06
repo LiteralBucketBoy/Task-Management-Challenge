@@ -58,7 +58,7 @@ const startDB = async function (){
             return { isValid: true };
 
     };
-    await server.register(hapiAuth);
+    await server.register([hapiAuth,require('vision'),require('inert'),require('lout')]);
     server.auth.strategy('jwt', 'jwt',
         { key: 'NeverShareYourSecret', // Never Share your secret key
             validate  // validate function defined above

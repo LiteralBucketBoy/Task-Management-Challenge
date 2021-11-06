@@ -1,36 +1,51 @@
-import {UserContext} from "./User";
+import {UserContext} from "../User";
 import React, {useContext} from "react";
-import openeye from "./UserData/openeye.png";
-import closedeye from "./UserData/closed-eye.png";
-
-
-
+import openeye from "./openeye.png";
+import closedeye from "./closed-eye.png";
+import {checkPasswordValidity} from "./PasswordValidator";
 
 
 const Profile = () => {
-    const { currentUser, userList, setUser} = useContext(UserContext);
+    const { currentUser, userList, setUser, currentToken} = useContext(UserContext);
     const [saveWarning, setSaveWarning] =  React.useState("");
     const [passwordWarning, setPasswordWarning] =  React.useState("");
-    const [newUser, setNewUser] = React.useState({name:currentUser});
+    const [newUser, setNewUser] = React.useState({name:currentUser,oldPassword: "", newPassword : "", confirmPassword: ""});
 
-    const handleSubmit = e => {
+    const handleSubmit = async e => {
         e.preventDefault();
         setSaveWarning("");
-            if(userList.userList.find(item => item.userName === currentUser).password !== newUser.oldPassword){
+        if(newUser.oldPassword === ""){
+            setPasswordWarning("Old Password is required")
+            return
+        }
+        if(newUser.newPassword === "" || checkPasswordValidity(newUser.newPassword)){
+            setPasswordWarning(checkPasswordValidity(newUser.newPassword))
+             return
+        }
+            if(newUser.newPassword === newUser.confirmPassword){
+                // setUser(newUser) doesnt pass on context
+               await fetch('/user/'+newUser.name, {
+                    method: 'PATCH',
+                    body: JSON.stringify({
+                        userPassword: newUser.newPassword,
+                        userOldPassword: newUser.oldPassword
+                    }),
+                    headers: {
+                        "Authorization" : currentToken,
+                        "Content-type": "application/json; charset=UTF-8"
+                    }
+                }).then((response, headers) => {
+            if(response.status === 401){
                 setPasswordWarning("Old Password is incorrect");
-
             }else{
                 setPasswordWarning("");
-                if(newUser.newPassword === newUser.confirmPassword){
-                    setUser(newUser);
-                    setPasswordWarning("");
-                    setNewUser({name:currentUser, oldPassword: "", newPassword:"", confirmPassword:""});
-                    setSaveWarning("Saved Changes");
-                }else{
-                    setPasswordWarning("Passwords don't match");
-                }
+                setNewUser({name:currentUser, oldPassword: "", newPassword:"", confirmPassword:""});
+                setSaveWarning("Saved Changes");
             }
-
+            });
+        }else{
+            setPasswordWarning("Passwords don't match");
+        }
     }
 
     const handleChange = e =>
@@ -89,8 +104,4 @@ const Profile = () => {
         </React.Fragment>
     );
 };
-
-
-
-
 export  default Profile;
