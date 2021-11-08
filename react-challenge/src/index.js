@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import reportWebVitals from './reportWebVitals';
+import reportWebVitals from './Tests/reportWebVitals';
 import SPA from "./SPA";
-import {UserInfo} from "./Components/User";
+import {UserInfo} from "./Components/Users/UserInfo";
 
 
 ReactDOM.render(

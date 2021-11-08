@@ -5,21 +5,26 @@ const {Task} = require("../models/tasks.model");
 
 const login = async (req, h) => {
     const user = await User.query().select('userName','password').where('userName', req.payload.logData.name);
-    if(!user){
+    console.log(user)
+    if(user.length===0){
         return h.response('').code(404);
-    }
-    const passwordCheck = await (req.payload.logData.password === user[0].password);
-    if(!passwordCheck){
-        return h.response('').code(401);
-    }
-    const token = new Promise(resolve => {
-        JWT.sign(req.payload.logData.name,'NeverShareYourSecret', function(err, token){
-        if(err){
-            throw new Error('ERR_INVALID_TOKEN')
+    }else{
+        const passwordCheck = await (req.payload.logData.password === user[0].password);
+        if(!passwordCheck){
+            return h.response('').code(401);
+        }else{
+
+            const token = new Promise(resolve => {
+                JWT.sign(req.payload.logData.name,'NeverShareYourSecret', function(err, token){
+                    if(err){
+                        throw new Error('ERR_INVALID_TOKEN')
+                    }
+                    resolve(token)
+                })})
+            return {token: await token}
         }
-        resolve(token)
-    })})
-   return {token: await token}
+    }
+
 
 }
 

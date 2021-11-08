@@ -1,7 +1,7 @@
 
-const Joi = require("joi");
+const Joi = require("@hapi/joi");
 const userHandler = require('../handlers/users.handler');
-const userSchema = require('../schemas/users.schema');
+//const userSchema = require('../schemas/users.schema');
 
 
 module.exports = [

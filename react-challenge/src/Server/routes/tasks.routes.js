@@ -1,7 +1,7 @@
 
-const Joi = require("joi");
+const Joi = require("@hapi/joi");
 const taskHandler = require('../handlers/tasks.handler');
-const taskModel = require('../schemas/tasks.schema')
+//const taskModel = require('../schemas/tasks.schema')
 
 
 module.exports = [
@@ -15,7 +15,7 @@ module.exports = [
                     userName: Joi.string()
                 }),
                 query: Joi.object({
-                    orderBy: Joi.string()
+                    filter: Joi.string()
                 })
             }
         }
@@ -47,6 +47,7 @@ module.exports = [
                 }),
                 payload: Joi.object({
                     isMarked: Joi.boolean(),
+                    userName: Joi.string(),
                     description: Joi.string()
                 })
             }

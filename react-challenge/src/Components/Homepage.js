@@ -1,5 +1,7 @@
 import React, { useContext } from "react";
-import {ListContext, TaskList} from "./TaskList";
+import {ListContext} from "./Tasks/ListContext";
+import {TaskList} from "./Tasks/TaskList";
+
 
 
 
@@ -38,8 +40,6 @@ function TaskForm({addTask}){
 const Homepage = () => {
     const {  addTask} = useContext(ListContext);
 
-
-
     return (
         <React.Fragment >
             <section className="content">
@@ -48,7 +48,6 @@ const Homepage = () => {
             <h1 className="content-items">Tasks</h1>
 
             <TaskList className="content-items" />
-
 
             </section>
         </React.Fragment>

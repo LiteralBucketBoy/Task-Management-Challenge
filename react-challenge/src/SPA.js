@@ -1,35 +1,29 @@
 import React, { useContext, useEffect,  useState} from "react";
 import {Route,   useLocation, Switch, BrowserRouter,  Link} from "react-router-dom";
 import Homepage from "./Components/Homepage";
-import Profile from "./Components/UserData/Profile"
+import Profile from "./Components/Users/Profile"
 import "./SPA.css";
-import {TaskListInfo} from "./Components/TaskList";
-import {NoAccess, UserContext, UserList} from "./Components/User";
-import SignUp from "./Components/UserData/SignUp";
-import LogIn from "./Components/UserData/LogIn";
-import Logo from "./Components/logo192.png"
+import {NoAccess, UserList} from "./Components/Users/UserList";
+import SignUp from "./Components/Users/Auth/SignUp";
+import LogIn from "./Components/Users/Auth/LogIn";
+import Logo from "./logo192.png"
+import {TaskListInfo} from "./Components/Tasks/TaskListInfo";
+import {UserContext} from "./Components/Users/UserContext";
 
 /**
 * Replaces the default App, defines and renders a SPA
 * */
 const SPA = () =>{
-
-
     const { currentUser, setCurrentUser,currentToken, setCurrentToken} = useContext(UserContext);
-    useEffect(()=>{
-        logOutCheck();
-        }
-     ,[currentUser]);
-
-    const [modalLogin, setModalLogin] = useState(currentUser === null || currentUser==="Guest");
+    const [modalLogin, setModalLogin] = useState(currentUser==="Guest");
     const [modalSignUp, setModalSignUp] = useState(!modalLogin && currentUser==="Guest");
-    const openLogin = () => setModalLogin(!modalLogin); /**toggles the login Modal**/
+    const openLogin =  React.useCallback(()=>{ setModalLogin(!modalLogin)},[modalLogin,setModalLogin]); /**toggles the login Modal**/
     const Toggle = () => {setModalSignUp(!modalSignUp); openLogin()}; /**toggles the signup modal, switching from login*/
 
     /**
     * If user logs out, sets to Guest Mode as default
     * */
-    const handleSignOut = async e => {
+    const handleSignOut =  React.useCallback(async e => {
         e.preventDefault();
         const requestOptions = {
             method: 'POST',
@@ -44,20 +38,20 @@ const SPA = () =>{
             console.log(json)
             window.location.reload();
         })
-
-    }
+    },[currentToken,setCurrentToken,setCurrentUser])
 
     /**
      * Switches the button for login if user logs out and vice-versa
      * @returns JSX.Element list item for login/logout
      * */
-    function logOutCheck(){
-        if(currentUser !== null && currentUser!=="Guest"){
+    function logOutCheck (){
+        if(currentUser!=="Guest"){
             return  <li className="logOut" type="button" onClick={handleSignOut}> <span>Log out </span></li>
         }else{
             return  <li className="logOut" type="button" onClick={openLogin}><span>Login </span></li>
         }
     }
+
 
     /***
      * Checks if user is Admin, adding a new tab in the navbar
@@ -119,7 +113,7 @@ function LoadPage() {
     useEffect(() => {
         if (currentPage !== showingPage) setFade("slideOut");
 
-    }, [currentPage]);
+    }, [currentPage,showingPage]);
 
     /***
      * Checks if user is Admin and provides the adequate component
@@ -150,7 +144,5 @@ function LoadPage() {
         </div>
     );
 }
-
-
 
 export default SPA;

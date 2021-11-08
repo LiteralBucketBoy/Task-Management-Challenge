@@ -1,54 +1,45 @@
 import React, { useContext} from "react";
 import './modal.css';
-import {UserContext} from "../User";
-import openeye from "./openeye.png";
-import closedeye from "./closed-eye.png";
+import {UserContext} from "../UserContext";
+import openEye from "./openeye.png";
+import closedEye from "./closed-eye.png";
 
 const LogIn = ({ modalShow, handleClose, handleSignUp }) => {
     const toggleClass = modalShow ? "modal display-block": "modal display-none";
-    const {  setCurrentUser, userList, setCurrentToken, currentToken} = useContext(UserContext);
+    const {  setCurrentUser, setCurrentToken} = useContext(UserContext);
 
     const [logData, setLogData] = React.useState({password:""});
 
     const [logWarning, setLogWarning] =  React.useState("");
 
-    const handleSubmit = e => {
+    const handleSubmit = async e => {
         e.preventDefault();
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ logData })
         };
-        if(logData.name!==null || logData.name!== "" ){
+        if(logData.name!==null && logData.name!== "" && logData.password!== ""){
             setLogWarning("");
-            fetch('/login', requestOptions)
-                .then(response =>
-                    response.json()
-                ).then(json => {
-                    setCurrentUser(logData.name);
-                    setCurrentToken(json.token);
-                    setLogWarning("");
-                    setLogData({});
-                    handleClose();
-                    return json;
-                }).catch(err => {
-                if(userList.userList.filter(item => item.userName === logData.name).length===0){
-                    setLogWarning("Username doesn't exist")
-                }else{
-                    setLogWarning("");
-                    const user = userList.userList.find(item => item.userName === logData.name)
-
-                    if(logData.password !== "" && logData.password===user.password){
-                        setCurrentUser(logData.name);
-
-                    }else{
+            await fetch('/login', requestOptions)
+                .then(response => {
+                    if(response.status === 404){
+                        setLogWarning("Username doesn't exists");
+                    }else if(response.status === 401){
                         setLogWarning("Password is incorrect");
+                    }else{
+                        response.json().then(json => {
+                            setCurrentUser(logData.name);
+                            setCurrentToken(json.token);
+                            setLogWarning("");
+                            setLogData({});
+                            handleClose();
+                            return json;
+                        })
                     }
-                }
-            });
-
+                })
         }else{
-            setLogWarning("Login invalid")
+            setLogWarning("Login invalid");
         }
 
     }
@@ -56,10 +47,10 @@ const LogIn = ({ modalShow, handleClose, handleSignUp }) => {
     const handleChange = e =>
         setLogData(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
 
-    const [showPassword, setshowPassword] = React.useState(false);
+    const [showPassword, setShowPassword] = React.useState(false);
 
     const toggleShow = () => {
-        setshowPassword(!showPassword);
+        setShowPassword(!showPassword);
     };
     return (
         <div  id="login" className={toggleClass}>
@@ -73,7 +64,7 @@ const LogIn = ({ modalShow, handleClose, handleSignUp }) => {
 
                     <label>Password</label>
                     <input type={showPassword ? "text" : "password"}  key="password" name="password" value={logData.password} onChange={handleChange}  required/>
-                    <button  type="button" className="showPasswordBtn"  onClick={toggleShow}><img className="showPassword" alt="Show Password" src={showPassword ? openeye : closedeye}/> </button>
+                    <button  type="button" className="showPasswordBtn"  onClick={toggleShow}><img className="showPassword" alt="Show Password" src={showPassword ? openEye : closedEye}/> </button>
                     <br/>
                     <label className="warning">{logWarning}</label>
 

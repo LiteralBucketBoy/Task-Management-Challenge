@@ -23,7 +23,7 @@ export const checkPasswordValidity = (value) => {
     }
 
     const isContainsSymbol =
-        /^(?=.*[~`!@#$%^&*()--+={}\[\]|\\:;"'<>,.?/_₹]).*$/;
+        /^(?=.*[~`!@#$%^&*()--+={}|:;[\]"'<>,.?/_₹]).*$/;
     if (!isContainsSymbol.test(value)) {
         return "Password must contain at least one Special Symbol.";
     }

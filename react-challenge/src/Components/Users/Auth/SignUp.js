@@ -1,12 +1,12 @@
 import React, { useContext} from "react";
 import './modal.css';
-import {UserContext} from "../User";
-import closedeye from "./closed-eye.png";
-import openeye from "./openeye.png";
+import closedEye from "./closed-eye.png";
+import openEye from "./openeye.png";
+import {UserContext} from "../UserContext";
 
 const SignUp = ({ modalShow,handleClose }) => {
     const toggleClass = modalShow ?  "modal display-block": "modal display-none";
-    const {  userList, addUser} = useContext(UserContext);
+    const { userList, addUser} = useContext(UserContext);
     const [newUser, setNewUser] = React.useState({});
 
     const [userNameWarning, setUsernameWarning] =  React.useState("");
@@ -35,10 +35,10 @@ const SignUp = ({ modalShow,handleClose }) => {
 
     const handleChange = e =>
         setNewUser(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
-    const [showPassword, setshowPassword] = React.useState(false);
+    const [showPassword, setShowPassword] = React.useState(false);
 
     const toggleShow = () => {
-        setshowPassword(!showPassword);
+        setShowPassword(!showPassword);
     };
     return (
         <div id="signup" className={toggleClass}>
@@ -56,7 +56,7 @@ const SignUp = ({ modalShow,handleClose }) => {
                     <label>Confirm Password</label>
                     <input type={showPassword ? "text" : "password"}  key="confirmPassword" name="confirmPassword" value={newUser.confirmPassword} onChange={handleChange}  required/>
                     <label className="warning">{passwordWarning}</label>
-                    <button type="button" className="showPasswordsBtn" onClick={toggleShow}><img className="showPassword" alt="Show Password" src={showPassword ? openeye : closedeye}/></button>
+                    <button type="button" className="showPasswordsBtn" onClick={toggleShow}><img className="showPassword" alt="Show Password" src={showPassword ? openEye : closedEye}/></button>
                     <button className="signInBtn" type="button" onClick={handleSubmit}>
                         Sign up
                     </button>

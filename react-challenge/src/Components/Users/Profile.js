@@ -1,12 +1,12 @@
-import {UserContext} from "../User";
+import {UserContext} from "./UserContext";
 import React, {useContext} from "react";
-import openeye from "./openeye.png";
-import closedeye from "./closed-eye.png";
-import {checkPasswordValidity} from "./PasswordValidator";
+import openEye from "./Auth/openeye.png";
+import closedEye from "./Auth/closed-eye.png";
+import {checkPasswordValidity} from "./Auth/PasswordValidator";
 
 
 const Profile = () => {
-    const { currentUser, userList, setUser, currentToken} = useContext(UserContext);
+    const { currentUser, currentToken} = useContext(UserContext);
     const [saveWarning, setSaveWarning] =  React.useState("");
     const [passwordWarning, setPasswordWarning] =  React.useState("");
     const [newUser, setNewUser] = React.useState({name:currentUser,oldPassword: "", newPassword : "", confirmPassword: ""});
@@ -34,7 +34,7 @@ const Profile = () => {
                         "Authorization" : currentToken,
                         "Content-type": "application/json; charset=UTF-8"
                     }
-                }).then((response, headers) => {
+                }).then((response) => {
             if(response.status === 401){
                 setPasswordWarning("Old Password is incorrect");
             }else{
@@ -51,10 +51,10 @@ const Profile = () => {
     const handleChange = e =>
         setNewUser(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
 
-    const [showPassword, setshowPassword] = React.useState(false);
+    const [showPassword, setShowPassword] = React.useState(false);
 
     const toggleShow = () => {
-        setshowPassword(!showPassword);
+        setShowPassword(!showPassword);
     };
 
     /***
@@ -76,7 +76,7 @@ const Profile = () => {
             <input type={showPassword ? "text" : "password"}  key="confirmPassword" name="confirmPassword" value={newUser.confirmPassword} onChange={handleChange}  required/>
             <label className="warning">{passwordWarning}</label>
             <br/>
-            <button type="button" className="showPasswordChangeBtn" onClick={toggleShow}><img className="showPassword" alt="Show Password" src={showPassword ? openeye : closedeye}/> Show passwords</button>
+            <button type="button" className="showPasswordChangeBtn" onClick={toggleShow}><img className="showPassword" alt="Show Password" src={showPassword ? openEye : closedEye}/> Show passwords</button>
             <br/>
             <button className="signInBtn" type="button" onClick={handleSubmit}>
                 Save change

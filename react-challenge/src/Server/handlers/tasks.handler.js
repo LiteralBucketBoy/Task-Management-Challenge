@@ -3,7 +3,7 @@ const {Task} = require('../models/tasks.model')
 const {User} = require("../models/users.model");
 
 
-const getTasks = async (req,h) => {
+const getTasks = async (req) => {
     const user = await User.query().select('uniqueId','userName','password').where('userName', req.params.userName);
     const tasks = await Task.query().where('ownerId', user[0].uniqueId);
 
@@ -25,7 +25,7 @@ const getTasks = async (req,h) => {
 
 }
 
-const addTask = async (req,h) => {
+const addTask = async (req) => {
     const user = await User.query().select('uniqueId','userName','password').where('userName', req.params.userName);
     const body =  {
         index : req.payload.index,
@@ -44,7 +44,7 @@ const addTask = async (req,h) => {
 
 
 const editTask = async (req,h) => {
-    let body = {} ;
+    let body ;
     let taskPatches = {dateModified: new Date().toISOString()};
 
     if(req.payload.isMarked!==null && req.payload.isMarked!==undefined ){
@@ -77,6 +77,9 @@ const editTask = async (req,h) => {
 
 const deleteTask = async (req,h) => {
     const tasks = await Task.query().deleteById(req.params.id);
+    if(!tasks){
+        return h.response().code(404)
+    }
     console.log(tasks)
     return {}
 }
