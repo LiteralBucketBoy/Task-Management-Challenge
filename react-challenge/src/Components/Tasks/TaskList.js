@@ -1,16 +1,16 @@
 import React from "react";
 import {ListContext} from "./ListContext";
 import {UserContext} from "../Users/UserContext";
-//import {createSelector} from "reselect";
 import {TaskItem} from "./TaskItem";
+import {createSelector} from "reselect";
 
 /**
 * Creates and renders the frontend of list of tasks in a table
 * */
 export function TaskList (){
     const {taskList} =  React.useContext(ListContext);
-    const {currentUser,currentToken} =  React.useContext(UserContext);
-    const [filteredList, setFilteredList] = React.useState([])
+    const {currentUser} =  React.useContext(UserContext);
+
     const [sortingStyle, setSortStyle] = React.useState("default")
     const [isHidden, setHidden] = React.useState(false);
     /***
@@ -26,72 +26,14 @@ export function TaskList (){
         }
         return 0;}
 
-   /* const selectTaskList = taskList => taskList;
-    const selectNonArchived = createSelector(selectTaskList, testList =>
-        testList.filter(item => !item.archived).sort(sortStyles
-        ).map(
-            (item, index) => (
-                <TaskItem
-                    key={item.uniqueId}
-                    index={index}
-                    task={item}
-                />
-            )))
-    const selectNonComplete = createSelector(selectTaskList, (testList) =>
-        testList.filter(item => !item.archived && item.isMarked===false).sort(
-            sortStyles).map(
-            (item, index) => (
-                <TaskItem
-                    key={item.uniqueId}
-                    index={index}
-                    task={item}
-                />
-            )))
-    */
 
-    /***
-     * Sets the filtered list when conditions change
-     * */
-    const filterList = React.useCallback(  async ()=>{
-        if(isHidden === true){
-            if(currentUser === "Guest"){
-                setFilteredList(taskList.testList)
-            }else {
-                await fetch('/todos/'+currentUser+'?filter=INCOMPLETE', {
-                    method: 'GET',
-                    headers: {
-                        "Authorization" : currentToken,
-                        "Content-type": "application/json; charset=UTF-8"
-                    }
-                }).then(response =>
-                    response.json()
-                ).then(json =>{
-                    setFilteredList(json.testList)
-                })
-            }
+    const selectByComplete = createSelector([taskList => taskList.testList,(taskList,isHidden) => isHidden], (testList) =>
+        testList.filter(item => isHidden ? item.isMarked===false : true).sort(sortStyles))
 
-        }else {
-            if(currentUser === "Guest"){
-                setFilteredList(taskList.testList)
-            }else {
-                await fetch('/todos/'+currentUser, {
-                    method: 'GET',
-                    headers: {
-                        "Authorization" : currentToken,
-                        "Content-type": "application/json; charset=UTF-8"
-                    }
-                }).then(response =>
-                    response.json()
-                ).then(json => {
-                    setFilteredList(json.testList)
-                })
-            }
-        }
-    },[currentToken,currentUser,taskList,isHidden])
+    const [filteredList, setFilteredList] = React.useState(selectByComplete(taskList))
 
-    React.useEffect(
-            filterList
-        , [isHidden,taskList,filterList]);
+    React.useEffect(()=> setFilteredList(selectByComplete(taskList)), [currentUser,isHidden, taskList, sortingStyle])
+
 
     /**
     * Handles the event for sorting
@@ -120,8 +62,7 @@ export function TaskList (){
             </thead>
             <tbody className="task-list">
                 {
-                    filteredList.filter(item => !item.archived).sort(
-                        sortStyles).map(
+                    filteredList.map(
                         (item, index) => (
                             <TaskItem
                                 key={item.uniqueId}

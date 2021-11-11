@@ -2,6 +2,8 @@
 import React, {useEffect} from "react";
 import {localToken, localUserListState, UserContext, localUserState, testUserState, userListState} from "./UserContext";
 
+
+
 /***
  * Feeds the state of the list
  */
@@ -33,7 +35,23 @@ export function UserInfo (props){
     useEffect(() => {
         localStorage.setItem("currentToken", JSON.stringify(currentToken));
     }, [currentToken]);
+    const getUsers = React.useCallback( async () => {
+        if(currentUser==="Guest"){return }
+            await fetch('/users/'+currentUser, {
+                method: 'GET',
+                headers: {
+                    "Authorization" : currentToken,
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+            }).then(response =>
+                response.json()
+            ).then(json => {
+                setUserList(json)
+            })
+        }
+        , [currentUser,currentToken])
 
+    React.useEffect(getUsers,[getUsers])
     /***
      * Adds a new user to the list, should encrypt password, but no point to it since it's localStorage and editable
      *

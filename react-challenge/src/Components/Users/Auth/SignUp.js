@@ -7,7 +7,7 @@ import {UserContext} from "../UserContext";
 const SignUp = ({ modalShow,handleClose }) => {
     const toggleClass = modalShow ?  "modal display-block": "modal display-none";
     const { userList, addUser} = useContext(UserContext);
-    const [newUser, setNewUser] = React.useState({});
+    const [newUser, setNewUser] = React.useState({name: "", password:"", confirmPassword:""});
 
     const [userNameWarning, setUsernameWarning] =  React.useState("");
     const [passwordWarning, setPasswordWarning] =  React.useState("");
@@ -41,8 +41,8 @@ const SignUp = ({ modalShow,handleClose }) => {
         setShowPassword(!showPassword);
     };
     return (
-        <div id="signup" className={toggleClass}>
-            <section className="modal-main">
+        <div   id="signup" className={toggleClass}>
+            <section  className="modal-main">
                 <form className="form-box" onSubmit={handleSubmit}>
                     <h1 className=""> Sign Up</h1>
                     <label>Username</label>

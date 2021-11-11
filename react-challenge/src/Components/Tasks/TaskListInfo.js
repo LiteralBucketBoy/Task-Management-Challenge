@@ -1,6 +1,6 @@
 import {v4 as uuidv4} from "uuid";
 import {UserContext} from "../Users/UserContext";
-import {ListContext, localState, localUser} from "./ListContext";
+import {ListContext, localState} from "./ListContext";
 import React from "react";
 
 /**
@@ -19,18 +19,27 @@ let reducer = (currentList, newList ) => {
  * Stores and manipulates the data of the list
  * */
 export function TaskListInfo (props){
-    const [taskList, setTaskList] = React.useReducer(reducer, localState(), undefined);/**In case it doesn't have local list it will provide a default one*/
+    const [taskList, setTaskList] = React.useReducer(reducer, {testList: []}, undefined);/**In case it doesn't have local list it will provide a default one*/
     const { currentUser, currentToken} = React.useContext(UserContext);
 
-    React.useEffect(() => {
-        if(currentUser !== null && currentUser !=="Guest"){
-            setTaskList( JSON.parse(localStorage.getItem("taskList"+currentUser.name) ));
-        }
-    }, [currentUser]);
 
-    React.useEffect(() => {
-        localStorage.setItem(("taskList" + localUser()), JSON.stringify(taskList));/**Stores in cache the task list*/
-    }, [currentUser,taskList]);
+    const getTasks = React.useCallback( async () => {
+        if(currentUser==="Guest"){
+            return setTaskList(localState());
+        }
+        await fetch('/todos/'+currentUser, {
+            method: 'GET',
+            headers: {
+                "Authorization" : currentToken,
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        }).then(response =>
+            response.json()
+        ).then(json => {
+            setTaskList(json)
+        })
+    }
+    , [currentToken, currentUser])
 
 
     /**
@@ -174,10 +183,16 @@ export function TaskListInfo (props){
             )
         }
     }
+    React.useEffect( ()=>{
+        localStorage.setItem("taskList"+currentUser.name, taskList);
+    }, [currentUser,taskList]);
+
+    React.useEffect(getTasks,[getTasks])
+
 
     return(
         <ListContext.Provider
-            value={{taskList, setTaskList, addTask, setMarkedTask, setTask, archiveTask, deleteTask}}> {props.children}
+            value={{taskList, setTaskList,getTasks, addTask, setMarkedTask, setTask, archiveTask, deleteTask}}> {props.children}
         </ListContext.Provider>
 
     )

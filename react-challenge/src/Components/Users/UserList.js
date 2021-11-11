@@ -8,36 +8,15 @@ import {UserContext} from "./UserContext";
 * Creates and renders the frontend of list of tasks in a table
 * */
 function UserList (){
-    const {userList, addUser, currentToken, currentUser} = useContext(UserContext);
+    const {userList, addUser} = useContext(UserContext);
     const [newUser, setNewUser] = React.useState({name: "", password:"", confirmPassword:""});
-    const [userTaskList, setUserTaskList] = React.useState();
+    const [userTaskList, setUserTaskList] = React.useState(userList.userList);
     const [userNameWarning, setUsernameWarning] =  React.useState("");
     const [passwordWarning, setPasswordWarning] =  React.useState("");
 
-    const fetchData = React.useCallback(async() => {
-            await fetch('/users/'+currentUser, {
-                method: 'GET',
-                headers: {
-                    "Authorization" : currentToken,
-                    "Content-type": "application/json; charset=UTF-8"
-                }
-            }).then(response =>
-                response.json()
-            ).then(json => {
-                setUserTaskList(json.userList.map(
-                    (item, index)  => (
-                        <UserItem
-                            key={item.uniqueId}
-                            index={index}
-                            user={item.userName}
-                            tasks={item.taskList}
-                        />
-                    ) ))
-            })
-    }, [currentToken,currentUser])
-    React.useEffect(
-         fetchData
-        , [fetchData, userList])
+    React.useEffect(()=>
+        setUserTaskList(userList.userList)
+        , [userList])
 
     const handleSubmit = async e => {
         e.preventDefault();
@@ -88,7 +67,15 @@ function UserList (){
                 </thead>
                 <tbody className="user-list">
                 {
-                    userTaskList
+                    userTaskList.map(
+                        (item, index)  => (
+                            <UserItem
+                                key={item.uniqueId}
+                                index={index}
+                                user={item.userName}
+                                tasks={item.taskList}
+                            />
+                        ) )
                 }
                 </tbody>
             </table>

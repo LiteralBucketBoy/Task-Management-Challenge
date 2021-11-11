@@ -8,7 +8,7 @@ const LogIn = ({ modalShow, handleClose, handleSignUp }) => {
     const toggleClass = modalShow ? "modal display-block": "modal display-none";
     const {  setCurrentUser, setCurrentToken} = useContext(UserContext);
 
-    const [logData, setLogData] = React.useState({password:""});
+    const [logData, setLogData] = React.useState({name:"",password:""});
 
     const [logWarning, setLogWarning] =  React.useState("");
 
@@ -32,7 +32,7 @@ const LogIn = ({ modalShow, handleClose, handleSignUp }) => {
                             setCurrentUser(logData.name);
                             setCurrentToken(json.token);
                             setLogWarning("");
-                            setLogData({});
+                            setLogData({name:"",password:""});
                             handleClose();
                             return json;
                         })

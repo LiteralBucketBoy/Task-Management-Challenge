@@ -70,7 +70,6 @@ const editTask = async (req,h) => {
     }else{
         return h.response(body).code(400)
     }
-
         return body
 }
 
